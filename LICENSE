@@ -19,11 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-The catalogue data files under `assets/data/` (datasets.json, portals.json,
-organisations.json, themes.json, audit-log.json) are licensed separately under
-the Creative Commons Attribution 4.0 International licence (CC-BY 4.0).
-Boundary geometry in `assets/data/india-states.geojson` is derived from Natural
-Earth and is in the public domain.

@@ -269,9 +269,9 @@ function renderList() {
             ${linkTag(d.link_health)}
           </div>
           <div class="secbtns">
-            <a class="srcbtn" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">View source ↗</a>
-            <button class="minbtn" data-open="${d.id}">Details</button>
-            <button class="minbtn" data-map="${d.id}">Open in map</button>
+            <a class="srcbtn" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">Source ↗</a>
+            <button class="minbtn" data-open="${d.id}">Open / preview</button>
+            <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Use with Studio ↗</a>
           </div>
         </div>
       </article>`;
@@ -336,7 +336,7 @@ function openDetail(id) {
       <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
         <a class="srcbtn" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">View source ↗</a>
         <button class="minbtn" data-map="${d.id}">Open in map</button>
-        <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Open in Studio ↗</a>
+        <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Use with Studio ↗</a>
       </div>
     </div>`;
   $('panel').querySelector('[data-map]').addEventListener('click', () => openInMap(d.id));
@@ -555,10 +555,15 @@ function computeGap() {
     ['OGC services', ogc.length], ['Earth-observation alternatives', eo.length],
     ['Global open alternatives', glob.length],
   ];
+  const verdict = gapVerdict(dlVector.length, apis.length, ogc.length, open.length);
+  const cta = (dlVector.length === 0 && apis.length === 0)
+    ? `<div style="margin-top:16px"><a class="srcbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Generate with Studio ↗</a></div>`
+    : '';
   el.innerHTML = `<div class="gapcard">
     <h3>${esc(themeOf(theme).label)} — ${esc(state)}</h3>
     <div class="gapgrid">${stats.map(([k, v]) => `<div class="gapstat"><b>${v}</b><span>${esc(k)}</span></div>`).join('')}</div>
-    ${gapVerdict(dlVector.length, apis.length, ogc.length, open.length)}
+    ${verdict}
+    ${cta}
   </div>`;
 }
 function gapVerdict(dl, api, ogc, open) {

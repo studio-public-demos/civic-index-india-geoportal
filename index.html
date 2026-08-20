@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nebula Civic Index — GeoIndia · Open Public Geospatial Data for India</title>
-<meta name="description" content="An open index of public geospatial datasets, services and portals for India — continuously discovered, verified and enriched with Studio AI.">
+<meta name="description" content="An open index of public geospatial datasets, services and portals for India — assembled and verified with a Studio-assisted workflow and human review.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -26,9 +26,9 @@
     </div>
     <h1>India's public geospatial data, <span class="accent">one search away</span>.</h1>
     <p class="lede"><strong>Discover. Verify. Understand. Use.</strong> — an open index of public geospatial
-       datasets, services and portals for India, continuously discovered, verified and enriched with
-       <strong>Studio AI</strong>. It is an open resource, not a data store: every record points to the
-       authoritative source.</p>
+       datasets, services and portals for India, assembled and verified with a
+       <strong>Studio-assisted</strong> discovery, classification and verification workflow, with human
+       review. It is an open resource, not a data store: every record points to the authoritative source.</p>
 
     <form class="searchbar" id="searchForm" role="search">
       <input type="search" id="queryInput" placeholder="What data are you looking for? e.g. building footprints Telangana"
@@ -60,6 +60,7 @@
     <a href="#gaps">Data gaps</a>
     <a href="#compare">Sources</a>
     <a href="#how">How it works</a>
+    <a href="#labs">Initiative</a>
   </div>
 </nav>
 
@@ -223,10 +224,11 @@
   <section id="how" class="section dark">
     <div class="wrap">
       <p class="eyebrow">How it works</p>
-      <h2>An index maintained by Studio, not by hand</h2>
+      <h2>Assembled with Studio, reviewed by people</h2>
       <p class="lede">The catalogue is assembled from primary sources — government portals, open-data platforms,
-         community data and international repositories — by a pipeline of Studio agents, with human review for
-         uncertain records.</p>
+         community data and international repositories — using a Studio-assisted discovery, classification and
+         verification workflow, with human review for uncertain records. Fully autonomous scheduled maintenance
+         is under development.</p>
       <div class="agents" id="agentsGrid"></div>
       <div class="cav">
         <div><span class="code">01</span>This is a <b>discovery layer</b>, not a data host. Nothing is re-served; every record links to the source, and the source's terms govern.</div>
@@ -243,6 +245,23 @@
       <p class="eyebrow">Methodology</p>
       <h2>How we classify, score and verify</h2>
       <div class="meth" id="methodologyGrid"></div>
+    </div>
+  </section>
+
+  <section id="labs" class="section pale">
+    <div class="wrap">
+      <div class="labsband">
+        <p class="eyebrow">The initiative</p>
+        <h2>Nebula Cloud Public Good Labs</h2>
+        <p class="sub">Applying AI, cloud computing and open technologies to public-interest data, research and digital infrastructure.</p>
+        <div class="domains">
+          <div class="domain live"><b>GeoIndia</b><span>Geospatial data discovery — flagship, live</span></div>
+          <div class="domain"><b>ClimateIndia</b><span>Climate &amp; environment</span></div>
+          <div class="domain"><b>UrbanIndia</b><span>Municipal &amp; urban data</span></div>
+          <div class="domain"><b>AgriIndia</b><span>Agriculture &amp; food systems</span></div>
+          <div class="domain"><b>HeritageIndia</b><span>Cultural &amp; heritage data</span></div>
+        </div>
+      </div>
     </div>
   </section>
 </main>

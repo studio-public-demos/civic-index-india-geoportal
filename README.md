@@ -16,8 +16,8 @@
 ## 1. Overview
 
 **Nebula Civic Index — GeoIndia** is an open index of public geospatial datasets,
-services and portals for India — *continuously discovered, verified and enriched
-with Studio AI*.
+services and portals for India — *assembled and verified with a Studio-assisted
+workflow and human review*.
 
 The core promise: **Discover. Verify. Understand. Use.**
 
@@ -37,9 +37,11 @@ A conventional catalogue is: *human research → catalogue → filters → links
 Civic Index is: *public internet + portals → Studio agents → structured
 catalogue → verification → geospatial intelligence → search / map / API.*
 
-The catalogue is **autonomously assembled and validated**, with human review for
-uncertain records. That makes it a live demonstration of Studio as an
-intelligence/automation layer, not a hand-maintained list.
+The catalogue is **assembled with a Studio-assisted workflow** — discovery,
+classification and verification — with human review for uncertain records. Fully
+autonomous scheduled maintenance is under development. That makes it a live
+demonstration of Studio as an intelligence/automation layer, rather than a
+hand-maintained list.
 
 ## 3. Studio agent pipeline
 
@@ -60,6 +62,8 @@ intelligence/automation layer, not a hand-maintained list.
 
 The seed pipeline that emits this repository's artefacts is committed in
 `tools/` (`prepare_boundaries.py`, `build_catalog.py`, `verify_links.py`).
+Autonomous scheduled operation (Studio missions on a cadence) is under
+development.
 
 ## 4. Features
 
@@ -169,13 +173,25 @@ as the intelligence layer that can *generate* what is missing.
 - Link verification is an automated HTTP check; a subset of government portals
   block automated agents and are honestly marked `unverified`.
 
-## 11. Built with NebulaCloud Studio
+## 11. Licence
+
+This repository is multi-licensed, and the distinction matters:
+
+- **Code** (HTML, CSS, JS, `tools/`): **MIT**.
+- **Catalogue metadata** (`assets/data/*.json`, excluding boundary geometry): **CC-BY 4.0**.
+- **Boundary geometry** (`assets/data/india-states.geojson`): **public domain** (Natural Earth).
+- **Third-party datasets**: remain under their respective source licences — this
+  index links to sources and does not redistribute the underlying data.
+
+See `LICENSE` and `ATTRIBUTIONS.md`.
+
+## 12. Built with NebulaCloud Studio
 
 This project was planned, orchestrated and produced with **NebulaCloud Studio**.
 
 - Website: https://nebulacloud.studio
 
-## 12. Call to action
+## 13. Call to action
 
 If this resonates with your organisation, Nebula Cloud Studio can help you stand
 up a similar open-data index — or the intelligence layer that fills the gaps in

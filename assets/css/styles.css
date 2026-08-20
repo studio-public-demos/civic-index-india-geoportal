@@ -236,6 +236,16 @@ mark{background:var(--accent-soft);color:inherit;padding:0 1px}
 .methcard h3{font-size:16px;margin-bottom:6px}
 .methcard p{font-size:14px;color:var(--muted)}
 
+/* Public Good Labs */
+.labsband{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}
+.labsband h2{margin:6px 0 10px}
+.domains{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:18px}
+.domain{background:var(--page);border:1px solid var(--hair);border-radius:8px;padding:14px}
+.domain b{display:block;font-size:15px;margin-bottom:3px}
+.domain span{font-size:13px;color:var(--muted)}
+.domain.live{border-color:var(--good);background:var(--good-soft)}
+.domain.live b::after{content:' · LIVE';color:var(--good);font-family:var(--mono);font-size:11px;letter-spacing:.05em}
+
 /* Footer */
 .foot{background:var(--primary-2);color:rgba(255,255,255,.75);padding:30px 0;text-align:center}
 .footline{font-size:15px;color:#fff}

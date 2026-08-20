@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use Nebula Civic Index — GeoIndia in your research, please cite it as below."
+title: "Nebula Civic Index — GeoIndia"
+abstract: "An open index of public geospatial datasets, services and portals for India, assembled and verified with a Studio-assisted workflow and human review."
+authors:
+  - name: "Nebula Cloud Public Good Labs"
+    website: "https://nebulacloud.studio"
+type: software
+license: CC-BY-4.0
+date-released: 2026-08-20
+repository-code: "https://github.com/studio-public-demos/civic-index-india-geoportal"
+url: "https://studio-public-demos.github.io/civic-index-india-geoportal/"
+keywords:
+  - geospatial
+  - open-data
+  - india
+  - data-catalog
+  - gis
