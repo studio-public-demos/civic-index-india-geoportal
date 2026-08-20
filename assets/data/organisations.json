@@ -1,0 +1,117 @@
+[
+  {
+    "id": "isro-nrsc",
+    "name": "ISRO / NRSC (National Remote Sensing Centre)",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "isro-sac",
+    "name": "ISRO / SAC (Space Applications Centre)",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "survey-of-india",
+    "name": "Survey of India",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "cwc",
+    "name": "Central Water Commission",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "imd",
+    "name": "India Meteorological Department",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "fsi",
+    "name": "Forest Survey of India",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "gsi",
+    "name": "Geological Survey of India",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "census",
+    "name": "Office of the Registrar General & Census Commissioner",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "icar",
+    "name": "ICAR (Indian Council of Agricultural Research)",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "natmo",
+    "name": "NATMO (National Atlas & Thematic Mapping Organisation)",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "nic",
+    "name": "NIC / Ministry of Electronics & IT",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "incois",
+    "name": "INCOIS (Indian National Centre for Ocean Information Services)",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "ksrsac",
+    "name": "KSRSAC (Karnataka State Remote Sensing Applications Centre)",
+    "type": "Government & PSU"
+  },
+  {
+    "id": "osm",
+    "name": "OpenStreetMap Foundation",
+    "type": "Community"
+  },
+  {
+    "id": "datameet",
+    "name": "DataMeet",
+    "type": "Community"
+  },
+  {
+    "id": "microsoft",
+    "name": "Microsoft",
+    "type": "Commercial Provider"
+  },
+  {
+    "id": "google",
+    "name": "Google Research",
+    "type": "Commercial Provider"
+  },
+  {
+    "id": "natural-earth",
+    "name": "Natural Earth",
+    "type": "NGO & International"
+  },
+  {
+    "id": "nasa",
+    "name": "NASA / CIESIN",
+    "type": "Scientific Institution"
+  },
+  {
+    "id": "usgs",
+    "name": "USGS",
+    "type": "Scientific Institution"
+  },
+  {
+    "id": "esa",
+    "name": "ESA / Copernicus",
+    "type": "NGO & International"
+  },
+  {
+    "id": "opentopography",
+    "name": "OpenTopography",
+    "type": "Scientific Institution"
+  },
+  {
+    "id": "icimod",
+    "name": "ICIMOD",
+    "type": "NGO & International"
+  }
+]

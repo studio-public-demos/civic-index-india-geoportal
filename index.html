@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nebula Civic Index — GeoIndia · Open Public Geospatial Data for India</title>
+<meta name="description" content="An open index of public geospatial datasets, services and portals for India — continuously discovered, verified and enriched with Studio AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+</head>
+<body>
+<a class="skip" href="#datasets">Skip to datasets</a>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brandrow">
+      <div class="brandmark">N</div>
+      <div class="brandtxt">
+        <span class="brand-name">Nebula Civic Index</span>
+        <span class="brand-sub">GeoIndia · by Nebula Cloud Public Good Labs</span>
+      </div>
+    </div>
+    <h1>India's public geospatial data, <span class="accent">one search away</span>.</h1>
+    <p class="lede"><strong>Discover. Verify. Understand. Use.</strong> — an open index of public geospatial
+       datasets, services and portals for India, continuously discovered, verified and enriched with
+       <strong>Studio AI</strong>. It is an open resource, not a data store: every record points to the
+       authoritative source.</p>
+
+    <form class="searchbar" id="searchForm" role="search">
+      <input type="search" id="queryInput" placeholder="What data are you looking for? e.g. building footprints Telangana"
+             aria-label="Search datasets" autocomplete="off">
+      <button type="submit" class="search-btn">Search</button>
+      <button type="button" class="ask-btn" id="askBtn" aria-pressed="false">Ask Studio</button>
+    </form>
+    <div class="searchmodes" role="tablist" aria-label="Search mode">
+      <button role="tab" aria-selected="true" data-mode="search" class="mode active">Browse &amp; filter</button>
+      <button role="tab" aria-selected="false" data-mode="ask" class="mode">Ask Studio <span class="pil">AI</span></button>
+    </div>
+
+    <div class="kpi" id="kpiStrip" aria-live="polite">
+      <div class="kpi-item"><b id="kpiDatasets">–</b><span>datasets</span></div>
+      <div class="kpi-item"><b id="kpiPortals">–</b><span>portals</span></div>
+      <div class="kpi-item"><b id="kpiAgencies">–</b><span>agencies</span></div>
+      <div class="kpi-item"><b id="kpiThemes">–</b><span>themes</span></div>
+      <div class="kpi-item"><b id="kpiVerified">–</b><span>links live</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="jumpbar" aria-label="Sections">
+  <div class="wrap">
+    <a href="#explore">Explore</a>
+    <a href="#map">Map</a>
+    <a href="#datasets">Datasets</a>
+    <a href="#assessment">Assessment</a>
+    <a href="#gaps">Data gaps</a>
+    <a href="#compare">Sources</a>
+    <a href="#how">How it works</a>
+  </div>
+</nav>
+
+<main>
+  <!-- Explore / filters -->
+  <section id="explore" class="section pale">
+    <div class="wrap">
+      <p class="eyebrow">Explore</p>
+      <h2>Search by geography or theme</h2>
+      <p class="sub">Filter once and every view below updates together. Or ask Studio in plain language.</p>
+
+      <div class="themestrip" id="themeChips" role="group" aria-label="Filter by theme"></div>
+
+      <div class="filters">
+        <div class="fctrl">
+          <span class="flabel">Scope</span>
+          <div class="pillrow" id="scopeRow"></div>
+        </div>
+        <div class="fctrl">
+          <span class="flabel">Provider type</span>
+          <div class="pillrow" id="provRow"></div>
+        </div>
+        <div class="fctrl">
+          <span class="flabel">Source</span>
+          <div class="pillrow" id="srcRow"></div>
+        </div>
+        <div class="fctrl">
+          <span class="flabel">Access tier</span>
+          <div class="pillrow" id="accessRow"></div>
+        </div>
+        <div class="fctrl">
+          <span class="flabel">Format</span>
+          <div class="pillrow" id="formatRow"></div>
+        </div>
+        <div class="fctrl">
+          <span class="flabel">Coverage (state/UT)</span>
+          <select id="stateSelect" class="sel"><option value="">All India / any</option></select>
+        </div>
+      </div>
+
+      <div class="activebar" id="activeBar"></div>
+    </div>
+  </section>
+
+  <!-- Ask Studio result -->
+  <section id="askResult" class="section pale askresult" hidden>
+    <div class="wrap">
+      <div class="askcard">
+        <div class="askhead">
+          <span class="askmark">Studio</span>
+          <h2 id="askTitle">Synthesized result</h2>
+        </div>
+        <div class="askbody" id="askBody"></div>
+        <div class="askfoot">Prototype Studio assistant (client-side v0.1). Production uses the Studio agent pipeline.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Map -->
+  <section id="map" class="section">
+    <div class="wrap">
+      <div class="mapgrid">
+        <div class="card">
+          <div class="rankhead"><h3>Datasets by state / UT</h3><button class="linkbtn" id="mapReset">Reset map</button></div>
+          <p class="sub" id="mapSub">Shaded by count in view — click a state to filter.</p>
+          <div id="map" aria-label="Map of India showing datasets by state"></div>
+          <div class="legend">
+            <div class="legendbar"></div>
+            <div class="legendlabels"><span>Fewer</span><span>More</span></div>
+          </div>
+          <p class="footnote">Boundaries: Natural Earth (public domain). Counts reflect datasets whose coverage is attributable to a single state/UT.</p>
+        </div>
+        <div class="card" id="mapDrill">
+          <h3>Reading the map</h3>
+          <p class="sub">Colour scale &amp; caveats</p>
+          <p class="footnote">National, multi-state and global records aren't attributed to a single state, so they aren't shaded here — they still count in the KPIs and the assessment. Select a state to see what's available for it, and use the gap analysis below to spot missing coverage.</p>
+          <div id="stateSummary"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Datasets -->
+  <section id="datasets" class="section pale">
+    <div class="wrap">
+      <div class="listhead">
+        <div>
+          <p class="eyebrow">Catalogue</p>
+          <h2>Datasets in the current view</h2>
+        </div>
+        <div class="listtools">
+          <p class="sub" id="listCount" aria-live="polite">Loading…</p>
+          <div class="sortwrap">
+            <label for="sortSelect">Sort</label>
+            <select id="sortSelect" class="sel">
+              <option value="title">Title A–Z</option>
+              <option value="portal">Portal</option>
+              <option value="updated">Most recent</option>
+              <option value="score">Studio score</option>
+            </select>
+            <label for="perSelect">Show</label>
+            <select id="perSelect" class="sel" style="min-width:70px">
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <button class="ghostbtn" id="downloadBtn">Download catalogue</button>
+        </div>
+      </div>
+      <div id="nudgeSlot"></div>
+      <div id="datasetList" class="dslist"></div>
+      <div id="pagerSlot" class="pager"></div>
+    </div>
+  </section>
+
+  <!-- Assessment -->
+  <section id="assessment" class="section">
+    <div class="wrap">
+      <div class="grid2">
+        <div class="card">
+          <div class="rankhead"><h3>Portal assessment</h3></div>
+          <p class="sub">Scored on open access, download capability, GIS-ready formats, recency, APIs and link reliability — click to drill in.</p>
+          <div id="portalScores"></div>
+          <details class="disclose">
+            <summary>How scores are computed</summary>
+            <p class="footnote">Each portal is scored 0–100 from its catalogued records: open &amp; free access (20), download capability (25), GIS-ready formats (15), API &amp; OGC services (15), data recency (15) and link reliability (10). See <a href="#methodology">methodology</a>.</p>
+          </details>
+        </div>
+        <aside class="panel" id="panel" aria-live="polite"></aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gap analysis -->
+  <section id="gaps" class="section pale">
+    <div class="wrap">
+      <p class="eyebrow">Public-data observatory</p>
+      <h2>Data availability gap analysis</h2>
+      <p class="sub">Pick a theme and a state to see authoritative vs open coverage, and where the gaps are.</p>
+      <div class="gapcontrols">
+        <div class="fctrl"><span class="flabel">Theme</span><select id="gapTheme" class="sel"></select></div>
+        <div class="fctrl"><span class="flabel">State / UT</span><select id="gapState" class="sel"></select></div>
+      </div>
+      <div id="gapResult"></div>
+    </div>
+  </section>
+
+  <!-- Source comparison -->
+  <section id="compare" class="section">
+    <div class="wrap">
+      <p class="eyebrow">Authoritative vs alternatives</p>
+      <h2>Compare authoritative and alternative sources</h2>
+      <p class="sub">For a given asset class, see what's available from government, the open community, global open data and Earth observation — and what Studio can generate.</p>
+      <div class="fctrl"><span class="flabel">Asset class</span><select id="compareTheme" class="sel"></select></div>
+      <div id="compareResult"></div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="section dark">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h2>An index maintained by Studio, not by hand</h2>
+      <p class="lede">The catalogue is assembled from primary sources — government portals, open-data platforms,
+         community data and international repositories — by a pipeline of Studio agents, with human review for
+         uncertain records.</p>
+      <div class="agents" id="agentsGrid"></div>
+      <div class="cav">
+        <div><span class="code">01</span>This is a <b>discovery layer</b>, not a data host. Nothing is re-served; every record links to the source, and the source's terms govern.</div>
+        <div><span class="code">02</span><b>Licence and access</b> are classified from source evidence and can mislead — always confirm at the source before use.</div>
+        <div><span class="code">03</span><b>Provenance first.</b> Every assertion carries its source, evidence and verification timestamp.</div>
+        <div><span class="code">04</span>The catalogue is <b>open data</b> — downloadable as JSON/CSV under an open licence.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Methodology -->
+  <section id="methodology" class="section">
+    <div class="wrap">
+      <p class="eyebrow">Methodology</p>
+      <h2>How we classify, score and verify</h2>
+      <div class="meth" id="methodologyGrid"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p class="footline">Nebula Civic Index — GeoIndia is an open public-data initiative by <strong>Nebula Cloud Public Good Labs</strong>.</p>
+    <p class="footcopy">Catalogue data is openly licensed and downloadable. Boundaries: Natural Earth (public domain). Basemap: © OpenStreetMap contributors, © CARTO.</p>
+    <footer style="text-align:center;padding:12px;margin-top:24px;opacity:0.5;font-size:11px;font-family:system-ui;color:#666;"><a href="https://nebulacloud.studio" style="color:#3b82f6;text-decoration:none;">Built with NebulaCloud Studio</a></footer>
+  </div>
+</footer>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>

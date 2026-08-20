@@ -1,0 +1,82 @@
+[
+  {
+    "id": "buildings",
+    "label": "Buildings",
+    "blurb": "Building footprints, structures, urban fabric."
+  },
+  {
+    "id": "land",
+    "label": "Land",
+    "blurb": "Land use, land cover, soils, land records."
+  },
+  {
+    "id": "agriculture",
+    "label": "Agriculture",
+    "blurb": "Crops, irrigation, agro-meteorology, farm data."
+  },
+  {
+    "id": "water",
+    "label": "Water",
+    "blurb": "Surface & groundwater, basins, hydrology, quality."
+  },
+  {
+    "id": "climate",
+    "label": "Climate",
+    "blurb": "Weather, climate, atmosphere, air quality."
+  },
+  {
+    "id": "disaster",
+    "label": "Disaster",
+    "blurb": "Floods, cyclones, drought, earthquakes, early warning."
+  },
+  {
+    "id": "transport",
+    "label": "Transport",
+    "blurb": "Roads, rail, ports, mobility networks."
+  },
+  {
+    "id": "urban",
+    "label": "Urban",
+    "blurb": "Cities, municipal boundaries, amenities, planning."
+  },
+  {
+    "id": "forestry",
+    "label": "Forest & Environment",
+    "blurb": "Forest cover, biodiversity, ecosystems."
+  },
+  {
+    "id": "elevation",
+    "label": "Elevation",
+    "blurb": "DEM/DTM, terrain, contours, slope."
+  },
+  {
+    "id": "imagery",
+    "label": "Satellite Imagery",
+    "blurb": "Optical & SAR scenes, mosaics, indices."
+  },
+  {
+    "id": "boundaries",
+    "label": "Administrative Boundaries",
+    "blurb": "State, district, tehsil, village boundaries."
+  },
+  {
+    "id": "demographics",
+    "label": "Demographics",
+    "blurb": "Census, population, socio-economic statistics."
+  },
+  {
+    "id": "infrastructure",
+    "label": "Infrastructure",
+    "blurb": "Energy, telecom, dams, public facilities."
+  },
+  {
+    "id": "marine",
+    "label": "Marine & Ocean",
+    "blurb": "Oceanography, coastal, fisheries, bathymetry."
+  },
+  {
+    "id": "energy",
+    "label": "Energy",
+    "blurb": "Power, renewables, solar/wind potential."
+  }
+]

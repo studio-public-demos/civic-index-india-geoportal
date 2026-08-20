@@ -1,0 +1,42 @@
+[
+  {
+    "id": "audit-0",
+    "agent": "discovery",
+    "action": "portal_identified",
+    "target": "bhuvan",
+    "note": "Portal added from ISRO/NRSC public page.",
+    "at": "2026-08-20T05:12:47Z"
+  },
+  {
+    "id": "audit-1",
+    "agent": "metadata",
+    "action": "dataset_extracted",
+    "target": "bhuvan-land-*",
+    "note": "LULC and thematic layers catalogued.",
+    "at": "2026-08-20T05:12:47Z"
+  },
+  {
+    "id": "audit-2",
+    "agent": "classification",
+    "action": "theme_normalised",
+    "target": "land",
+    "note": "Mapped to fixed theme group 'Land'.",
+    "at": "2026-08-20T05:12:47Z"
+  },
+  {
+    "id": "audit-3",
+    "agent": "verification",
+    "action": "link_checked",
+    "target": "https://bhuvan.nrsc.gov.in",
+    "note": "Endpoint reachable (seed check).",
+    "at": "2026-08-20T05:12:47Z"
+  },
+  {
+    "id": "audit-4",
+    "agent": "publishing",
+    "action": "catalogue_emitted",
+    "target": "datasets.json",
+    "note": "Seed catalogue written by build_catalog.py.",
+    "at": "2026-08-20T05:12:47Z"
+  }
+]
