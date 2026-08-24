@@ -400,6 +400,30 @@ function openDetail(id) {
   $('drawerClose').focus();
 }
 
+function drawerFocusables() {
+  return Array.from($('datasetDrawer').querySelectorAll('a[href], button:not([disabled]), select:not([disabled]), textarea:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+    .filter((el) => el.offsetParent !== null);
+}
+
+function trapDrawerFocus(e) {
+  if (e.key !== 'Tab' || $('datasetDrawer').hidden) return;
+  const focusables = drawerFocusables();
+  if (!focusables.length) {
+    e.preventDefault();
+    $('drawerClose').focus();
+    return;
+  }
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
 function closeDetail() {
   $('datasetDrawer').hidden = true;
   $('drawerBackdrop').hidden = true;
@@ -686,7 +710,7 @@ function computeGap() {
     : '';
   el.innerHTML = `<div class="gapcard">
     <h3>${esc(themeOf(theme).label)} — ${esc(state)}</h3>
-    <div class="gapgrid">${stats.map(([k, v]) => `<div class="gapstat"><b>${v}</b><span>${esc(k)}</span></div>`).join('')}</div>
+    <div class="gapgrid">${stats.map(([k, v]) => `<div class="gapstat" data-gap-stat="${esc(k)}"><b>${v}</b><span>${esc(k)}</span></div>`).join('')}</div>
     ${verdict}
     <p class="footnote">Gap analysis reflects this seed catalogue. "No suitable source is currently catalogued" is not the same as "no data exists."</p>
     ${cta}
@@ -956,5 +980,6 @@ document.addEventListener('DOMContentLoaded', () => {
   $('drawerBackdrop').addEventListener('click', closeDetail);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !$('datasetDrawer').hidden) closeDetail();
+    trapDrawerFocus(e);
   });
 });
