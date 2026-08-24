@@ -29,3 +29,12 @@ jobs:
 
       - name: Validate catalogue and static site
         run: python tools/validate_site.py
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E
+        run: npm test

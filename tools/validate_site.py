@@ -27,6 +27,7 @@ class SiteHTMLParser(HTMLParser):
         self.anchors: list[str] = []
         self.local_assets: list[str] = []
         self.external_blank_links: list[tuple[str, str]] = []
+        self.meta: list[tuple[str, str]] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         a = {k: v or "" for k, v in attrs}
@@ -38,6 +39,15 @@ class SiteHTMLParser(HTMLParser):
             self.local_assets.append(a["href"])
         if tag == "script" and a.get("src") and not is_external(a["src"]):
             self.local_assets.append(a["src"])
+        if tag == "meta":
+            key = a.get("property") or a.get("name")
+            content = a.get("content", "")
+            if key:
+                self.meta.append((key, content))
+            if key in {"og:image", "twitter:image"} and content:
+                parsed = urlparse(content)
+                if parsed.scheme in {"http", "https"} and parsed.netloc == "studio-public-demos.github.io":
+                    self.local_assets.append(parsed.path.removeprefix("/civic-index-india-geoportal/"))
         if tag == "a" and a.get("target") == "_blank" and is_external(a.get("href", "")):
             self.external_blank_links.append((a.get("href", ""), a.get("rel", "")))
 
@@ -91,15 +101,20 @@ def validate_catalog(errors: list[str]) -> None:
             errors.append(f"Dataset {d.get('id')} has non-list formats")
         if d.get("url") and is_external(str(d["url"])) is False:
             errors.append(f"Dataset {d.get('id')} has malformed external URL {d.get('url')}")
+        if d.get("source_class") == "government":
+            errors.append(f"Dataset {d.get('id')} uses deprecated source_class 'government'; use 'authoritative'")
 
     for p in portals:
         if p.get("organisation") not in org_ids:
             errors.append(f"Portal {p.get('id')} references missing organisation {p.get('organisation')}")
+        if p.get("url") and is_external(str(p["url"])) is False:
+            errors.append(f"Portal {p.get('id')} has malformed external URL {p.get('url')}")
 
 
 def validate_html(errors: list[str]) -> None:
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
     parser = SiteHTMLParser()
-    parser.feed((ROOT / "index.html").read_text(encoding="utf-8"))
+    parser.feed(html)
 
     counts = Counter(parser.ids)
     dupes = sorted(k for k, n in counts.items() if n > 1)
@@ -120,12 +135,52 @@ def validate_html(errors: list[str]) -> None:
         if not {"noopener", "noreferrer"}.issubset(tokens):
             errors.append(f"External _blank link missing rel='noopener noreferrer': {href}")
 
+    metas = dict(parser.meta)
+    for key in ("og:image", "twitter:image"):
+        if key not in metas:
+            errors.append(f"Missing social preview metadata: {key}")
+    if "summary_large_image" != metas.get("twitter:card"):
+        errors.append("Twitter card should use summary_large_image")
+    if 'role="img"' in html:
+        errors.append("Interactive map container must not use role='img'")
+    for required in ("Live catalogue", "Available via Nebula", "Coming soon", "Exploring / planned"):
+        if required not in html:
+            errors.append(f"Missing launch status label: {required}")
+    for required in (
+        "India — GeoIndia",
+        "Europe edition",
+        "United States edition",
+        "Build locally. Standardize globally.",
+        "first live regional edition",
+    ):
+        if required not in html:
+            errors.append(f"Missing Civic Index architecture text: {required}")
+    for fake_route in ('href="/europe"', 'href="/us"', 'href="/india"', 'href="europe"', 'href="us"'):
+        if fake_route in html:
+            errors.append(f"Unexpected fake regional route exposed: {fake_route}")
+
+
+def validate_app(errors: list[str]) -> None:
+    app = (ROOT / "assets" / "js" / "app.js").read_text(encoding="utf-8")
+    required_snippets = [
+        "d.source_class === 'authoritative'",
+        "Potential data gap.",
+        "safeExternalUrl(p.url)",
+        "safeExternalUrl(d.url)",
+        "URL.createObjectURL(blob)",
+        "coverageLabel = state || (scope === 'Global' ? 'Global'",
+    ]
+    for snippet in required_snippets:
+        if snippet not in app:
+            errors.append(f"Missing application invariant: {snippet}")
+
 
 def main() -> int:
     errors: list[str] = []
     validate_json(errors)
     validate_catalog(errors)
     validate_html(errors)
+    validate_app(errors)
 
     if errors:
         print("Validation failed:")

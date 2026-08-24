@@ -1,0 +1,13 @@
+{
+  "name": "geoindia-prelaunch-qa",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.46.1",
+    "axe-core": "^4.10.0"
+  }
+}

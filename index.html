@@ -12,9 +12,14 @@
 <meta property="og:description" content="Discover public geospatial datasets, services and portals across India; assess access, provenance and usability; compare sources; identify gaps; and act with NebulaCloud Studio.">
 <meta property="og:url" content="https://studio-public-demos.github.io/civic-index-india-geoportal/">
 <meta property="og:type" content="website">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://studio-public-demos.github.io/civic-index-india-geoportal/assets/images/geoindia-social.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="GeoIndia — Public Geospatial Data Intelligence for India">
 <meta name="twitter:description" content="Find, verify, compare and act on India's fragmented public geospatial data.">
+<meta name="twitter:image" content="https://studio-public-demos.github.io/civic-index-india-geoportal/assets/images/geoindia-social.png">
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -45,10 +50,11 @@
       <div class="brandmark">N</div>
       <div class="brandtxt">
         <span class="brand-name">Nebula Civic Index</span>
-        <span class="brand-sub">GeoIndia · by Nebula Cloud Public Good Labs</span>
+        <span class="brand-sub">GeoIndia · first live regional edition</span>
       </div>
     </div>
     <h1>Find the data. Know whether to trust it. See what's missing.</h1>
+    <p class="editionline">The first live regional edition of Nebula Civic Index.</p>
     <p class="lede">GeoIndia is an open intelligence layer for India's fragmented public geospatial data. Discover datasets, services and portals; assess access, freshness and provenance; compare authoritative and alternative sources; identify coverage gaps; and move into analysis with NebulaCloud Studio.</p>
     <div class="journey" aria-label="GeoIndia workflow">
       <span>Find</span><i aria-hidden="true"></i><span>Verify</span><i aria-hidden="true"></i><span>Compare</span><i aria-hidden="true"></i><span>Act</span>
@@ -58,13 +64,9 @@
     <form class="searchbar" id="searchForm" role="search">
       <input type="search" id="queryInput" placeholder="Search building footprints, DEM, land use, roads, flood data..."
              aria-label="Search datasets" autocomplete="off">
-      <button type="submit" class="search-btn">Search</button>
+      <button type="submit" class="search-btn">Search catalogue</button>
       <button type="button" class="ask-btn" id="askBtn" aria-pressed="false">Ask GeoIndia</button>
     </form>
-    <div class="searchmodes" role="group" aria-label="Search mode">
-      <button type="button" aria-pressed="true" data-mode="search" class="mode active">Browse &amp; filter</button>
-      <button type="button" aria-pressed="false" data-mode="ask" class="mode">Ask catalogue <span class="pil">Metadata</span></button>
-    </div>
 
     <div class="kpi" id="kpiStrip" aria-live="polite">
       <div class="kpi-item"><b id="kpiDatasets">–</b><span>datasets</span></div>
@@ -86,6 +88,9 @@
     <a href="#gaps">Data gaps</a>
     <a href="#compare">Compare sources</a>
     <a href="#delivery">Delivery</a>
+    <a href="#partner">Partner</a>
+    <a href="#civic-index">Civic Index</a>
+    <a href="#next">What's next</a>
     <a href="#methodology">Methodology</a>
     <a href="#labs">Public Good Labs</a>
   </div>
@@ -167,7 +172,7 @@
       <div class="mapgrid">
         <div class="card">
           <div class="rankhead"><h3>Datasets by state / UT</h3><button class="linkbtn" id="mapReset">Reset map</button></div>
-          <p class="sub" id="mapSub">Shaded by count in view — click a state to filter.</p>
+          <p class="sub" id="mapSub">Shaded by single-state records in view — click a state to filter. State filtering includes state-specific, national and applicable global sources.</p>
           <div id="map" role="region" tabindex="0" aria-label="Interactive map of India showing catalogued datasets by state or union territory" aria-describedby="mapSub"></div>
           <div class="legend">
             <div class="legendbar"></div>
@@ -220,6 +225,14 @@
     </div>
   </section>
 
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="dataset-drawer" id="datasetDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
+    <div class="drawer-shell">
+      <button class="drawer-close" id="drawerClose" type="button" aria-label="Close dataset details">×</button>
+      <div id="drawerContent"></div>
+    </div>
+  </aside>
+
   <!-- Assessment -->
   <section id="assessment" class="section">
     <div class="wrap">
@@ -270,24 +283,73 @@
       <div class="deliverygrid">
         <article class="deliverycard">
           <h3>Analyse with Studio</h3>
+          <span class="status-badge status-nebula">Available via Nebula</span>
           <p>Take relevant datasets into Studio-assisted GIS, data and AI workflows for transformation, geospatial analysis, comparison, mapping, reporting and execution.</p>
           <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Explore NebulaCloud Studio ↗</a>
         </article>
         <article class="deliverycard">
           <h3>Data readiness &amp; managed intelligence</h3>
+          <span class="status-badge status-nebula">Available via Nebula</span>
           <p>Source relevant data, assess availability, verify access, normalize CRS/schema/formats, package analysis-ready datasets and identify project or tender data risks.</p>
           <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Learn about managed intelligence ↗</a>
         </article>
         <article class="deliverycard">
           <h3>Generate what's missing</h3>
+          <span class="status-badge status-nebula">Available via Nebula</span>
           <p>Where suitable public data is unavailable, Studio workflows can support derivation of selected assets such as building footprints, land-use / land-cover, change detection and terrain products, subject to source availability and project requirements.</p>
           <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Generate with Studio ↗</a>
         </article>
         <article class="deliverycard">
           <h3>Private Data Observatory</h3>
-          <p>Use the same pattern for internal and public datasets, metadata cataloguing, provenance, quality signals and organisation-specific data intelligence in private deployments, with source monitoring treated as a roadmap capability.</p>
+          <span class="status-badge status-nebula">Available via Nebula</span>
+          <p>Use the same pattern for internal and public datasets, metadata cataloguing, provenance, quality signals and organisation-specific data intelligence in private deployments.</p>
           <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Explore enterprise possibilities ↗</a>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="partner" class="section">
+    <div class="wrap">
+      <p class="eyebrow">Partner with Civic Index</p>
+      <h2>Turn public-data discovery into operational delivery.</h2>
+      <p class="sub">GeoIndia is live as an open discovery and intelligence layer. We welcome collaboration with think tanks, policy organisations, market-research and advisory firms, geospatial analytics and Earth-observation companies, universities, researchers, NGOs, development organisations, civic-tech and open-data communities, industry bodies and public-sector institutions.</p>
+      <div class="partner-actions">
+        <a class="ghostbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Open NebulaCloud Studio ↗</a>
+        <a class="ghostbtn" href="#civic-index">View collaboration areas</a>
+        <span class="status-badge status-live">Live catalogue</span>
+        <span class="status-badge status-nebula">Available via Nebula</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="civic-index" class="section pale">
+    <div class="wrap">
+      <p class="eyebrow">Nebula Civic Index</p>
+      <h2>Civic Index across jurisdictions</h2>
+      <p class="sub">Nebula Civic Index is an open public-data intelligence initiative by Nebula Cloud Public Good Labs. It helps make fragmented public datasets easier to discover, verify, compare and act on across jurisdictions. GeoIndia is the first live regional edition.</p>
+      <p class="sub">Public data is abundant but fragmented across agencies, portals and jurisdictions. Civic Index is designed to provide a reusable intelligence layer for discovering what exists, understanding whether it is usable, comparing sources and identifying what is missing. Build locally. Standardize globally.</p>
+      <div class="editiongrid" aria-label="Regional Civic Index editions">
+        <article class="editioncard live-edition">
+          <span class="status-badge status-live">Live</span>
+          <h3>India — GeoIndia</h3>
+          <p>India's public geospatial data ecosystem.</p>
+        </article>
+        <article class="editioncard">
+          <span class="status-badge status-coming">Coming soon</span>
+          <h3>Europe edition</h3>
+          <p>Expected to begin with EU-level infrastructure and selected national ecosystems.</p>
+        </article>
+        <article class="editioncard">
+          <span class="status-badge status-coming">Coming soon</span>
+          <h3>United States edition</h3>
+          <p>Expected to begin with federal sources before expanding into state and local public-data ecosystems.</p>
+        </article>
+      </div>
+      <div class="collabbox">
+        <h3>Help build the next Civic Index</h3>
+        <p>We welcome collaboration with researchers, universities, open-data communities, geospatial organisations, civic-tech groups and public institutions interested in helping develop the Europe and United States editions.</p>
+        <p class="footnote">Collaboration areas include source discovery, catalogue validation, jurisdiction expertise, metadata harmonisation, geospatial standards, research, open-data policy, benchmark use cases and technology integration.</p>
       </div>
     </div>
   </section>
@@ -311,6 +373,19 @@
     </div>
   </section>
 
+  <section id="next" class="section pale">
+    <div class="wrap">
+      <p class="eyebrow">What's next</p>
+      <h2>Launch now; keep larger platform capabilities on the roadmap.</h2>
+      <div class="roadmapgrid">
+        <article><span class="status-badge status-coming">Coming soon</span><h3>Direct Studio handoff</h3><p>Send a selected dataset or filtered catalogue view into a live Studio workspace.</p></article>
+        <article><span class="status-badge status-coming">Coming soon</span><h3>Source monitoring</h3><p>Scheduled checks for portal, endpoint and dataset-change signals.</p></article>
+        <article><span class="status-badge status-coming">Coming soon</span><h3>APIs and authenticated execution</h3><p>Programmatic catalogue access and authenticated workflows for partner deployments.</p></article>
+        <article><span class="status-badge status-planned">Exploring / planned</span><h3>Additional Public Good Labs initiatives</h3><p>Climate, urban, agriculture and heritage data intelligence initiatives.</p></article>
+      </div>
+    </div>
+  </section>
+
   <!-- Methodology -->
   <section id="methodology" class="section">
     <div class="wrap">
@@ -325,9 +400,16 @@
       <div class="labsband">
         <p class="eyebrow">The initiative</p>
         <h2>Nebula Cloud Public Good Labs</h2>
-        <p class="sub">Applying AI, cloud computing and open technologies to public-interest data, research and digital infrastructure. GeoIndia is live; the adjacent domains are planned or being explored.</p>
+        <p class="sub">Applying AI, cloud computing and open technologies to public-interest data, research and digital infrastructure.</p>
+        <h3>Nebula Civic Index</h3>
+        <p class="sub">Public-data intelligence across jurisdictions.</p>
+        <div class="domains regional-domains">
+          <div class="domain live"><b>India — GeoIndia</b><span>India's public geospatial data ecosystem</span><em>Live</em></div>
+          <div class="domain coming"><b>Europe edition</b><span>EU-level and selected national public-data ecosystems</span><em>Coming soon</em></div>
+          <div class="domain coming"><b>United States edition</b><span>Federal, state and local public-data ecosystems</span><em>Coming soon</em></div>
+        </div>
+        <h3 class="initiative-head">Other Public Good Labs initiatives</h3>
         <div class="domains">
-          <div class="domain live"><b>GeoIndia</b><span>Geospatial data intelligence</span><em>Live</em></div>
           <div class="domain"><b>ClimateIndia</b><span>Climate &amp; environment</span><em>Exploring</em></div>
           <div class="domain"><b>UrbanIndia</b><span>Municipal &amp; urban data</span><em>Planned</em></div>
           <div class="domain"><b>AgriIndia</b><span>Agriculture &amp; food systems</span><em>Planned</em></div>
@@ -340,8 +422,8 @@
 
 <footer class="foot">
   <div class="wrap">
-    <p class="footline">Nebula Civic Index — GeoIndia is an open public-data initiative by <strong>Nebula Cloud Public Good Labs</strong>.</p>
-    <p class="footcopy">GeoIndia is an independent public-good initiative and is not an official Government of India portal. Catalogue metadata is openly licensed and downloadable. Source terms govern underlying datasets. Boundaries: Natural Earth (public domain). Basemap: © OpenStreetMap contributors, © CARTO.</p>
+    <p class="footline">Nebula Civic Index — GeoIndia is the first live regional edition of Nebula Civic Index, an open public-data intelligence initiative by <strong>Nebula Cloud Public Good Labs</strong>.</p>
+    <p class="footcopy">GeoIndia focuses on geospatial data intelligence for India. Europe and United States editions are planned next. GeoIndia is independent and is not an official Government of India portal. Source terms govern; underlying datasets are not re-hosted.</p>
     <p class="studiofoot"><a href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Built with NebulaCloud Studio</a></p>
   </div>
 </footer>
