@@ -61,9 +61,9 @@
       <button type="submit" class="search-btn">Search</button>
       <button type="button" class="ask-btn" id="askBtn" aria-pressed="false">Ask GeoIndia</button>
     </form>
-    <div class="searchmodes" role="tablist" aria-label="Search mode">
-      <button role="tab" aria-selected="true" data-mode="search" class="mode active">Browse &amp; filter</button>
-      <button role="tab" aria-selected="false" data-mode="ask" class="mode">Ask catalogue <span class="pil">Metadata</span></button>
+    <div class="searchmodes" role="group" aria-label="Search mode">
+      <button type="button" aria-pressed="true" data-mode="search" class="mode active">Browse &amp; filter</button>
+      <button type="button" aria-pressed="false" data-mode="ask" class="mode">Ask catalogue <span class="pil">Metadata</span></button>
     </div>
 
     <div class="kpi" id="kpiStrip" aria-live="polite">
@@ -72,7 +72,7 @@
       <div class="kpi-item"><b id="kpiAgencies">–</b><span>agencies</span></div>
       <div class="kpi-item"><b id="kpiThemes">–</b><span>themes</span></div>
       <div class="kpi-item"><b id="kpiVerified">–</b><span>links live</span></div>
-      <div class="kpi-item"><b id="kpiLastVerified">–</b><span>last verification</span></div>
+      <div class="kpi-item"><b id="kpiLastVerified">–</b><span>latest link check</span></div>
     </div>
   </div>
 </header>
@@ -168,7 +168,7 @@
         <div class="card">
           <div class="rankhead"><h3>Datasets by state / UT</h3><button class="linkbtn" id="mapReset">Reset map</button></div>
           <p class="sub" id="mapSub">Shaded by count in view — click a state to filter.</p>
-          <div id="map" role="img" aria-label="Interactive map of India showing catalogued datasets by state or union territory"></div>
+          <div id="map" role="region" tabindex="0" aria-label="Interactive map of India showing catalogued datasets by state or union territory" aria-describedby="mapSub"></div>
           <div class="legend">
             <div class="legendbar"></div>
             <div class="legendlabels"><span>Fewer</span><span>More</span></div>
@@ -285,7 +285,7 @@
         </article>
         <article class="deliverycard">
           <h3>Private Data Observatory</h3>
-          <p>Use the same pattern for internal and public datasets, metadata cataloguing, provenance, quality signals, source monitoring and organisation-specific data intelligence in private deployments.</p>
+          <p>Use the same pattern for internal and public datasets, metadata cataloguing, provenance, quality signals and organisation-specific data intelligence in private deployments, with source monitoring treated as a roadmap capability.</p>
           <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Explore enterprise possibilities ↗</a>
         </article>
       </div>
@@ -303,7 +303,7 @@
          of the platform roadmap.</p>
       <div class="agents" id="agentsGrid"></div>
       <div class="cav">
-        <div><span class="code">01</span>This is a <b>discovery layer</b>, not a data host. Nothing is re-served; every record links to the source, and the source's terms govern.</div>
+        <div><span class="code">01</span>This is a <b>discovery layer</b>, not a data host. Underlying datasets are not re-hosted; every record links to the source, and the source's terms govern.</div>
         <div><span class="code">02</span><b>Licence and access</b> classifications are informational. Confirm source terms before production or commercial use.</div>
         <div><span class="code">03</span><b>Provenance first.</b> Every assertion carries its source, evidence and verification timestamp.</div>
         <div><span class="code">04</span>The catalogue is <b>open data</b> — downloadable as JSON/CSV under an open licence.</div>

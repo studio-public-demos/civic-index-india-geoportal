@@ -555,7 +555,7 @@ function openPortal(id) {
       <div class="meta">${esc(o.name)} · ${esc(o.type)}</div>
     </div>
     <div class="panel-body">
-      <div class="defrow"><span class="k">URL</span><span class="v"><a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${esc(p.url)} ↗</a></span></div>
+      <div class="defrow"><span class="k">URL</span><span class="v"><a href="${esc(safeExternalUrl(p.url))}" target="_blank" rel="noopener noreferrer">${esc(p.url)} ↗</a></span></div>
       <div class="defrow"><span class="k">Scope</span><span class="v">${esc(p.scope)}</span></div>
       <div class="defrow"><span class="k">Datasets</span><span class="v">${ds.length} catalogued</span></div>
       <div class="defrow"><span class="k">OGC / API / STAC</span><span class="v">${p.ogc ? 'OGC · ' : ''}${p.api ? 'API · ' : ''}${p.stac ? 'STAC' : '—'}</span></div>
@@ -590,7 +590,7 @@ function computeGap() {
   const el = $('gapResult');
   const base = S.data.filter((d) => d.theme === theme);
   const scoped = base.filter((d) => !d.state || d.state === state);
-  const gov = scoped.filter((d) => d.source_class === 'authoritative' || d.source_class === 'eo-derived');
+  const gov = scoped.filter((d) => d.source_class === 'authoritative');
   const open = scoped.filter((d) => d.access_tier === 'Open' || d.access_tier === 'Open (Registration)');
   const dlVector = scoped.filter((d) => d.downloadable && d.formats.some((f) => /geojson|shapefile|geotiff|topojson|csv/i.test(f)));
   const apis = scoped.filter((d) => d.api || d.api_ready);
@@ -617,7 +617,7 @@ function computeGap() {
 }
 function gapVerdict(dl, api, ogc, open) {
   if (dl === 0 && api === 0 && ogc === 0) {
-    return `<div class="gapverdict gap"><b>Data gap identified.</b> No suitable downloadable/API/OGC source is currently catalogued for this theme and geography. Check alternative sources or consider Studio-assisted generation where technically appropriate.</div>`;
+    return `<div class="gapverdict gap"><b>Potential data gap.</b> No suitable downloadable/API/OGC source is currently catalogued for this theme and geography. Check alternative sources or consider Studio-assisted generation where technically appropriate.</div>`;
   } else if (dl === 0 || (open === 0 && dl > 0)) {
     return `<div class="gapverdict partial"><b>Partial / constrained coverage.</b> Relevant records are catalogued, but open download or access evidence is limited. Verify access and terms at the source.</div>`;
   }
@@ -707,6 +707,7 @@ function askStudio(query) {
   if (themes.length) detected.push('theme: ' + themes.map((t) => t.label).join(', '));
   if (state) detected.push('geography: ' + state);
   if (scope) detected.push('scope: ' + scope);
+  const coverageLabel = state || (scope === 'Global' ? 'Global' : 'All India / national');
 
   $('askResult').hidden = false;
   $('askTitle').textContent = `Catalogue result for "${query}"`;
@@ -718,7 +719,7 @@ function askStudio(query) {
       <tr><th>OGC services</th><td>${ogcN}</td></tr>
       <tr><th>APIs</th><td>${apiN}</td></tr>
       <tr><th>Formats</th><td>${fmts.length ? fmts.map(esc).join(', ') : '—'}</td></tr>
-      <tr><th>Coverage</th><td>${state || 'All India / national'}</td></tr>
+      <tr><th>Coverage</th><td>${esc(coverageLabel)}</td></tr>
       <tr><th>Access</th><td>${open} openly accessible · ${n - open} restricted/other</td></tr>
       <tr><th>Link health</th><td>${live} live · ${n - live} broken/down/unverified</td></tr>
       <tr><th>Freshness</th><td>${yrs.length ? Math.max(...yrs) : 'not recorded'}</td></tr>
@@ -829,7 +830,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function setMode(m) {
     S.mode = m;
     document.querySelectorAll('.mode').forEach((x) => x.classList.toggle('active', x.dataset.mode === m));
-    document.querySelectorAll('.mode').forEach((x) => x.setAttribute('aria-selected', x.dataset.mode === m));
+    document.querySelectorAll('.mode').forEach((x) => x.setAttribute('aria-pressed', x.dataset.mode === m));
     $('askBtn').setAttribute('aria-pressed', m === 'ask');
     if (m === 'ask') {
       $('askResult').hidden = false;
