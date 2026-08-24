@@ -88,3 +88,24 @@ test('desktop/mobile page has no serious axe violations', async ({ page }) => {
   await waitForCatalogue(page);
   await expectNoCriticalA11yIssues(page);
 });
+
+test('Civic Index regional architecture is truthful and non-routable', async ({ page }) => {
+  await page.goto('/');
+  await waitForCatalogue(page);
+  const civic = page.locator('#civic-index');
+  await expect(civic).toContainText('Civic Index across jurisdictions');
+  await expect(civic).toContainText('India — GeoIndia');
+  await expect(civic).toContainText('Live');
+  await expect(civic).toContainText('Europe edition');
+  await expect(civic).toContainText('Coming soon');
+  await expect(civic).toContainText('United States edition');
+  await expect(civic).toContainText('Build locally. Standardize globally.');
+  await expect(civic.getByRole('link')).toHaveCount(0);
+  await expect(civic).not.toContainText(/Europe indexed|US data available|worldwide catalogue|global coverage/i);
+
+  const labs = page.locator('#labs');
+  await expect(labs).toContainText('Nebula Civic Index');
+  await expect(labs).toContainText('Other Public Good Labs initiatives');
+  await expect(labs).toContainText('ClimateIndia');
+  await expect(labs).toContainText('Exploring');
+});

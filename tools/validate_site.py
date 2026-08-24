@@ -146,6 +146,18 @@ def validate_html(errors: list[str]) -> None:
     for required in ("Live catalogue", "Available via Nebula", "Coming soon", "Exploring / planned"):
         if required not in html:
             errors.append(f"Missing launch status label: {required}")
+    for required in (
+        "India — GeoIndia",
+        "Europe edition",
+        "United States edition",
+        "Build locally. Standardize globally.",
+        "first live regional edition",
+    ):
+        if required not in html:
+            errors.append(f"Missing Civic Index architecture text: {required}")
+    for fake_route in ('href="/europe"', 'href="/us"', 'href="/india"', 'href="europe"', 'href="us"'):
+        if fake_route in html:
+            errors.append(f"Unexpected fake regional route exposed: {fake_route}")
 
 
 def validate_app(errors: list[str]) -> None:

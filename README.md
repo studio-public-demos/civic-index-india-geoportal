@@ -22,6 +22,30 @@ Public geospatial data for India is spread across national agencies, state geopo
 
 GeoIndia is designed to answer those questions from catalogued evidence. It is a discovery and intelligence layer, not a data host. Every dataset record links to the source, and the source's terms govern the underlying data.
 
+## Nebula Civic Index
+
+Nebula Civic Index is an open public-data intelligence initiative by Nebula Cloud Public Good Labs. It helps make fragmented public datasets easier to discover, verify, compare and act on across jurisdictions.
+
+GeoIndia is the first live regional edition. Europe and the United States are planned next, but they are not live products in this repository. The current repository remains specifically the India implementation.
+
+The expansion principle is: **Build locally. Standardize globally.** Each regional edition should respect local institutions, licensing, standards, jurisdiction hierarchy, languages and data infrastructure while normalizing evidence into a shared intelligence model.
+
+No Europe or United States datasets are currently served by this GeoIndia repository unless explicitly catalogued as global alternatives relevant to India.
+
+## Regional Roadmap
+
+### India
+
+GeoIndia is live and remains focused on India's public geospatial data ecosystem.
+
+### Europe
+
+Coming soon. The Europe edition is expected to begin with EU-level infrastructure and selected national ecosystems, including sources such as EU open-data infrastructure, INSPIRE, Copernicus, Eurostat, the European Environment Agency, national mapping/open-data agencies and selected regional or local public-data infrastructure.
+
+### United States
+
+Coming soon. The United States edition is expected to begin with federal sources such as federal open data, USGS, Census, NOAA, NASA, FEMA, EPA, USDA and transport/infrastructure data before expanding into selected state GIS clearinghouses and county/city open-data portals.
+
 ## More Than A Directory
 
 A conventional directory is a list of links. GeoIndia adds a structured intelligence layer:
@@ -48,7 +72,7 @@ The public catalogue remains free and open. Commercial value begins after discov
 
 ## Product Model
 
-GeoIndia follows the launch model:
+GeoIndia follows the Civic Index launch model:
 
 **Open Index -> Intelligence -> Execution -> Enterprise**
 
@@ -93,6 +117,57 @@ The public application is deliberately static and dependency-light:
 | Tooling | Python stdlib scripts plus optional boundary prep dependency |
 | Hosting | GitHub Pages |
 
+## Jurisdiction-Neutral Architecture Direction
+
+The current GeoIndia JSON remains stable for launch. Conceptually, Civic Index is intended to evolve toward a jurisdiction-aware model:
+
+```text
+Country
+-> Jurisdiction
+-> Organisation
+-> Portal
+-> Catalogue
+-> Dataset / Service / API
+-> Geographic coverage
+-> Licence
+-> Access
+-> Formats / protocols
+-> Verification evidence
+-> Quality / usability
+-> Alternatives
+-> Gaps
+```
+
+Jurisdiction should eventually represent scales such as India, Telangana, the European Union, Germany, Bavaria, the United States, California or Los Angeles County.
+
+Jurisdiction-aware Civic Index intelligence can support future workflows such as project data feasibility, market research, infrastructure intelligence, tender/bid data assessment, public-data sourcing and geography-specific evidence gathering. These are architectural directions, not public-site features in this repository.
+
+### Future Civic Intelligence API
+
+Future API concepts may include:
+
+```text
+GET /jurisdictions
+GET /datasets/search
+GET /sources
+GET /coverage
+GET /quality
+GET /provenance
+GET /alternatives
+GET /gaps
+GET /availability
+GET /changes
+```
+
+Potential query concepts:
+
+```text
+/datasets/search?theme=buildings&country=US&region=California
+/gaps?theme=flood-risk&country=DE
+```
+
+These endpoints are not exposed by the current static GeoIndia site.
+
 ## Repository Structure
 
 ```text
@@ -113,6 +188,7 @@ civic-index-india-geoportal/
 ## Scope And Limitations
 
 - The catalogue is a seed public index, not an exhaustive inventory of every Indian geospatial dataset.
+- Europe and United States editions are roadmap positioning only in this repository; no regional catalogues, maps, pipelines or cross-region search are implemented here.
 - Ask GeoIndia is a deterministic client-side metadata synthesis feature, not a production AI agent.
 - The public site does not re-host underlying datasets.
 - The public site does not start live Studio missions, monitoring jobs, API subscriptions, alerts or authentication flows.
@@ -133,4 +209,4 @@ See `LICENSE` and `ATTRIBUTIONS.md`.
 
 Nebula Civic Index — GeoIndia is an independent public-good initiative by Nebula Cloud Public Good Labs. It is not an official Government of India portal.
 
-The broader Public Good Labs direction includes GeoIndia, ClimateIndia, UrbanIndia, AgriIndia and HeritageIndia. GeoIndia is live; the others are planned or being explored and are not presented as launched products in this repository.
+Nebula Civic Index is the public-data intelligence programme across jurisdictions: India is live through GeoIndia, while Europe and the United States are coming soon. Separately, Public Good Labs is exploring thematic initiatives such as ClimateIndia, UrbanIndia, AgriIndia and HeritageIndia. Those thematic initiatives are not presented as launched Civic Index regional editions in this repository.

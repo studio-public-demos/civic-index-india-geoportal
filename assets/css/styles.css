@@ -37,7 +37,7 @@ a{color:var(--primary)}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500}
 .sub{color:var(--muted);margin:6px 0 0;max-width:70ch}
 .footnote{font-size:13px;color:var(--muted);margin:12px 0 0}
-.section{padding:44px 0}
+.section{padding:44px 0;scroll-margin-top:68px}
 .section.pale{background:var(--card);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
 .skip{position:absolute;left:-9999px}
 .skip:focus{left:12px;top:12px;z-index:100;background:#fff;padding:8px 14px;border-radius:6px}
@@ -58,6 +58,7 @@ a{color:var(--primary)}
 .journey span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:6px;padding:6px 10px;font-size:14px}
 .journey i{width:24px;height:1px;background:rgba(255,255,255,.35)}
 .trustline{margin-top:14px;color:rgba(255,255,255,.76);font-size:13px;font-family:var(--mono)}
+.editionline{margin-top:10px;color:var(--accent);font-weight:700;font-size:14px}
 
 /* Search */
 .searchbar{display:flex;gap:10px;margin:22px 0 12px;max-width:820px}
@@ -277,6 +278,14 @@ mark{background:var(--accent-soft);color:inherit;padding:0 1px}
 
 /* Partner / roadmap */
 .partner-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.editiongrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:20px}
+.editioncard{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.editioncard h3{font-size:17px;margin:10px 0 6px}
+.editioncard p{font-size:14px;color:var(--muted)}
+.live-edition{border-color:#b8dcc6;background:var(--good-soft)}
+.collabbox{margin-top:18px;border:1px solid var(--hair);border-radius:var(--radius);background:var(--card);padding:18px;box-shadow:var(--shadow)}
+.collabbox h3{font-size:17px;margin-bottom:6px}
+.collabbox p{font-size:14px;color:var(--muted);max-width:86ch}
 .roadmapgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:18px}
 .roadmapgrid article{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
 .roadmapgrid h3{font-size:16px;margin:10px 0 6px}
@@ -298,6 +307,10 @@ mark{background:var(--accent-soft);color:inherit;padding:0 1px}
 .domain em{display:inline-block;margin-top:10px;font-style:normal;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .domain.live{border-color:var(--good);background:var(--good-soft)}
 .domain.live em{color:var(--good)}
+.domain.coming{border-color:#eccb9c;background:var(--warn-soft)}
+.domain.coming em{color:var(--warn)}
+.regional-domains{margin-bottom:22px}
+.initiative-head{margin-top:24px}
 
 /* Footer */
 .foot{background:var(--primary-2);color:rgba(255,255,255,.75);padding:30px 0;text-align:center}
