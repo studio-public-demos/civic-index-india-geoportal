@@ -24,8 +24,8 @@
     "machine_readable": { "type": "boolean" },
     "gis_ready": { "type": "boolean" },
     "api_ready": { "type": "boolean" },
-    "published_year": { "type": ["integer", "null"] },
-    "updated_year": { "type": ["integer", "null"] },
+    "published_year": { "type": ["integer", "string", "null"], "pattern": "^[0-9]{4}$" },
+    "updated_year": { "type": ["integer", "string", "null"], "pattern": "^[0-9]{4}$" },
     "keywords": { "type": "array", "items": { "type": "string" } },
     "link_health": { "type": "string", "enum": ["live", "dead", "down", "unverified", "not_checked"] },
     "verified_at": { "type": ["string", "null"], "format": "date-time" }

@@ -15,11 +15,13 @@ record contributes to its portal's score on six weighted dimensions:
 Records marked **Not specified** are excluded from a dimension rather than
 assumed — the score reflects what is actually catalogued and evidenced.
 
-## Per-dataset "Studio score"
+## Per-dataset usability score
 
 Each dataset also carries a 0–100 usability score: machine-readable (25),
 GIS-ready (25), downloadable (20), API available (15) and recency (15). This
-drives the *Studio score* sort and the synthesized "Ask Studio" assessment.
+drives the dataset usability sort and the synthesized Ask GeoIndia catalogue
+assessment. It does not certify thematic accuracy, legal clearance or production
+fitness.
 
 ## Caveats
 

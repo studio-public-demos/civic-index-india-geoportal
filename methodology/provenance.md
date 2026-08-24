@@ -39,6 +39,12 @@ coverage, link that could not be verified) are flagged for human review rather
 than silently resolved. The goal is honesty: "unverified" is a truthful state,
 not a failure.
 
+## Maintenance
+
+The current catalogue combines Studio-assisted workflows with human review.
+Autonomous scheduled maintenance, source monitoring and endpoint/schema change
+detection are platform roadmap directions, not live public-site features.
+
 ## Reproducibility
 
 The pipeline that produces the catalogue artefacts is committed in `tools/`:
