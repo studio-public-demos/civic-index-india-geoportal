@@ -12,8 +12,11 @@ Every dataset is assigned one of four source tiers, which power the
 | **Global open** (`global-open`) | International open-data providers with India coverage. | Microsoft, Google, NASA, ESA/Copernicus, Natural Earth. |
 | **Earth observation** (`eo-derived`) | Satellite-derived products. | Bhuvan, NICES, MOSDAC, VEDAS, NDEM. |
 
-A fifth tier — **Studio-generated** — is a capability of the platform (on-demand
-extraction from imagery) rather than a catalogued source.
+A fifth row — **Studio-assisted generation** — is shown in the public comparison
+table as a possible post-discovery pathway, not as a catalogued source. Where
+suitable public data is unavailable, Studio workflows can derive selected
+geospatial assets from imagery or other source data, subject to source
+availability, quality and project requirements.
 
 ## Themes
 

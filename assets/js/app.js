@@ -1,4 +1,4 @@
-/* Nebula Civic Index — GeoIndia · front-end application (v0.1) */
+/* Nebula Civic Index — GeoIndia · front-end application */
 'use strict';
 
 /* ------------------------------------------------------------------ */
@@ -48,6 +48,28 @@ const BOUND = {};
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => (s == null ? '' : String(s)).replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const STUDIO_URL = 'https://nebulacloud.studio';
+
+function safeExternalUrl(url) {
+  try {
+    const u = new URL(String(url));
+    return (u.protocol === 'https:' || u.protocol === 'http:') ? u.href : '#';
+  } catch (_) {
+    return '#';
+  }
+}
+
+function yearValue(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function dateLabel(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toISOString().slice(0, 10);
+}
 
 function hl(text) {
   const t = esc(text);
@@ -100,7 +122,7 @@ function sortData(list) {
   list = list.slice();
   if (by === 'title') list.sort((a, b) => a.title.localeCompare(b.title));
   else if (by === 'portal') list.sort((a, b) => (portalOf(a.portal).name).localeCompare(portalOf(b.portal).name));
-  else if (by === 'updated') list.sort((a, b) => (b.updated_year || b.published_year || 0) - (a.updated_year || a.published_year || 0));
+  else if (by === 'updated') list.sort((a, b) => yearValue(b.updated_year || b.published_year) - yearValue(a.updated_year || a.published_year));
   else list.sort((a, b) => datasetScore(b) - datasetScore(a) || a.title.localeCompare(b.title));
   return list;
 }
@@ -161,6 +183,8 @@ function renderKPI() {
   const live = S.data.filter((d) => d.link_health === 'live').length;
   const total = S.data.length;
   $('kpiVerified').textContent = total ? Math.round((live / total) * 100) + '%' : '–';
+  const dates = S.data.map((d) => Date.parse(d.verified_at)).filter(Number.isFinite);
+  $('kpiLastVerified').textContent = dates.length ? new Date(Math.max(...dates)).toISOString().slice(0, 10) : 'Unverified';
 }
 
 /* ------------------------------------------------------------------ */
@@ -269,9 +293,9 @@ function renderList() {
             ${linkTag(d.link_health)}
           </div>
           <div class="secbtns">
-            <a class="srcbtn" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">Source ↗</a>
-            <button class="minbtn" data-open="${d.id}">Open / preview</button>
-            <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Use with Studio ↗</a>
+            <a class="srcbtn" href="${esc(safeExternalUrl(d.url))}" target="_blank" rel="noopener noreferrer">View source ↗</a>
+            <button class="minbtn" data-open="${esc(d.id)}">Inspect</button>
+            <a class="minbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Analyse with Studio ↗</a>
           </div>
         </div>
       </article>`;
@@ -300,8 +324,8 @@ function accClass(acc) {
 }
 function linkTag(lh) {
   if (lh === 'live') return '<span class="tag live">Link live</span>';
-  if (lh === 'dead' || lh === 'down') return '<span class="tag dead">Link broken</span>';
-  return '<span class="tag neutral">Unverified</span>';
+  if (lh === 'dead' || lh === 'down') return '<span class="tag dead">Broken/down</span>';
+  return '<span class="tag unverified">Unverified</span>';
 }
 
 /* ------------------------------------------------------------------ */
@@ -329,17 +353,22 @@ function openDetail(id) {
       <div class="defrow"><span class="k">Access tier</span><span class="v"><span class="tag ${accClass(d.access_tier)}">${esc(ACCESS_LABELS[d.access_tier] || d.access_tier)}</span></span></div>
       <div class="defrow"><span class="k">Licence</span><span class="v">${esc(d.licence)}</span></div>
       <div class="defrow"><span class="k">Source class</span><span class="v"><span class="dot" style="color:${sc.color}">●</span> ${esc(sc.label)}</span></div>
-      <div class="defrow"><span class="k">Link health</span><span class="v">${linkTag(d.link_health)} ${d.verified_at ? '· verified ' + esc(d.verified_at.slice(0, 10)) : ''}</span></div>
+      <div class="defrow"><span class="k">Link health</span><span class="v">${linkTag(d.link_health)} ${dateLabel(d.verified_at) ? '· verified ' + esc(dateLabel(d.verified_at)) : ''}</span></div>
       <div class="defrow"><span class="k">Published / updated</span><span class="v">${d.published_year || '—'} / ${d.updated_year || '—'}</span></div>
       <div class="defrow"><span class="k">OGC / API</span><span class="v">${d.ogc ? 'OGC services · ' : ''}${d.api || d.api_ready ? 'API' : 'None advertised'}</span></div>
-      <div class="defrow"><span class="k">Studio score</span><span class="v"><b>${score}</b>/100 (machine-readable ${d.machine_readable ? '✓' : '✗'} · GIS-ready ${d.gis_ready ? '✓' : '✗'} · downloadable ${d.downloadable ? '✓' : '✗'})</span></div>
-      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-        <a class="srcbtn" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">View source ↗</a>
-        <button class="minbtn" data-map="${d.id}">Open in map</button>
-        <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Use with Studio ↗</a>
+      <div class="defrow"><span class="k">Usability score</span><span class="v"><b>${score}</b>/100 (machine-readable ${d.machine_readable ? 'yes' : 'no'} · GIS-ready ${d.gis_ready ? 'yes' : 'no'} · downloadable ${d.downloadable ? 'yes' : 'no'})</span></div>
+      <div class="next-actions">
+        <h4>What can I do next?</h4>
+        <div class="secbtns">
+          <a class="srcbtn" href="${esc(safeExternalUrl(d.url))}" target="_blank" rel="noopener noreferrer">View authoritative/source page ↗</a>
+          <button class="minbtn" data-open="${esc(d.id)}">Inspect metadata</button>
+          <button class="minbtn" data-map="${esc(d.id)}">Locate geography on map</button>
+          <a class="minbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Analyse with Studio ↗</a>
+        </div>
       </div>
     </div>`;
   $('panel').querySelector('[data-map]').addEventListener('click', () => openInMap(d.id));
+  $('panel').querySelector('[data-open]').addEventListener('click', () => $('panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
   $('panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -413,6 +442,24 @@ function renderMap() {
     if (S.map.loaded()) updateMapPaint();
   }
   $('mapSub').textContent = S.state ? `Filtered to ${S.state} — click again to clear.` : 'Shaded by count in view — click a state to filter.';
+  renderStateSummary(list, counts);
+}
+
+function renderStateSummary(list, counts) {
+  const el = $('stateSummary');
+  if (!el) return;
+  const scoped = S.state ? list.filter((d) => d.state === S.state) : list.filter((d) => d.state);
+  const stateName = S.state || 'Single-state records';
+  const topThemes = [...new Set(scoped.map((d) => d.theme))]
+    .map((theme) => ({ theme, n: scoped.filter((d) => d.theme === theme).length }))
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 4);
+  const total = S.state ? (counts[S.state] || 0) : scoped.length;
+  el.innerHTML = `<div class="statebox">
+    <b>${esc(stateName)}</b>
+    <span>${total} state-attributed dataset${total === 1 ? '' : 's'} in the current view.</span>
+    ${topThemes.length ? `<ul>${topThemes.map((x) => `<li>${esc(themeOf(x.theme).label)} <strong>${x.n}</strong></li>`).join('')}</ul>` : '<p>No single-state records match the current filters.</p>'}
+  </div>`;
 }
 
 function fillExpr() {
@@ -453,7 +500,7 @@ function openInMap(id) {
   } else if (S.map) {
     S.map.flyTo({ center: [79.6, 22.8], zoom: 3.9, duration: 600 });
   }
-  document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' });
 }
 
 /* ------------------------------------------------------------------ */
@@ -467,7 +514,7 @@ function portalScore(p) {
   const gis = ds.filter((d) => d.gis_ready).length / ds.length;
   const apiR = p.api ? 1 : ds.filter((d) => d.api || d.api_ready).length / ds.length;
   const yrs = ds.map((d) => d.updated_year || d.published_year || 0).filter((y) => y > 0);
-  const rec = yrs.length ? Math.min(1, Math.max(0, (Math.max(...yrs) - 2010) / 14)) : 0.3;
+  const rec = yrs.length ? Math.min(1, Math.max(0, (Math.max(...yrs.map(yearValue)) - 2010) / 14)) : 0.3;
   const checked = ds.filter((d) => d.link_health === 'live' || d.link_health === 'dead' || d.link_health === 'down');
   const link = checked.length ? ds.filter((d) => d.link_health === 'live').length / checked.length : 0.5;
   const parts = [
@@ -508,11 +555,12 @@ function openPortal(id) {
       <div class="meta">${esc(o.name)} · ${esc(o.type)}</div>
     </div>
     <div class="panel-body">
-      <div class="defrow"><span class="k">URL</span><span class="v"><a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${esc(p.url)} ↗</a></span></div>
+      <div class="defrow"><span class="k">URL</span><span class="v"><a href="${esc(safeExternalUrl(p.url))}" target="_blank" rel="noopener noreferrer">${esc(p.url)} ↗</a></span></div>
       <div class="defrow"><span class="k">Scope</span><span class="v">${esc(p.scope)}</span></div>
       <div class="defrow"><span class="k">Datasets</span><span class="v">${ds.length} catalogued</span></div>
       <div class="defrow"><span class="k">OGC / API / STAC</span><span class="v">${p.ogc ? 'OGC · ' : ''}${p.api ? 'API · ' : ''}${p.stac ? 'STAC' : '—'}</span></div>
-      <h3 style="margin:14px 0 8px">Assessment — ${s.score}/100</h3>
+      <h3 style="margin:14px 0 8px">GeoIndia portal assessment — ${s.score}/100</h3>
+      <p class="footnote">Comparative usability score based on catalogued evidence. It is not an official rating or certification.</p>
       ${s.parts.map(([k, v, mx]) => `<div class="mixrow" style="display:grid;grid-template-columns:170px 1fr 40px;gap:10px;align-items:center;font-size:13px;margin:5px 0"><span>${esc(k)}</span><span class="track" style="height:8px;background:var(--page);border-radius:4px;position:relative"><i style="position:absolute;left:0;top:0;bottom:0;background:var(--primary);border-radius:4px;width:${Math.round(v / mx * 100)}%"></i></span><span style="text-align:right;font-family:var(--mono);font-size:12px">${v.toFixed(1)}</span></div>`).join('')}
       <div class="defrow" style="margin-top:12px"><span class="k">Description</span><span class="v">${esc(p.description)}</span></div>
     </div>`;
@@ -542,7 +590,7 @@ function computeGap() {
   const el = $('gapResult');
   const base = S.data.filter((d) => d.theme === theme);
   const scoped = base.filter((d) => !d.state || d.state === state);
-  const gov = scoped.filter((d) => d.source_class === 'authoritative' || d.source_class === 'eo-derived');
+  const gov = scoped.filter((d) => d.source_class === 'authoritative');
   const open = scoped.filter((d) => d.access_tier === 'Open' || d.access_tier === 'Open (Registration)');
   const dlVector = scoped.filter((d) => d.downloadable && d.formats.some((f) => /geojson|shapefile|geotiff|topojson|csv/i.test(f)));
   const apis = scoped.filter((d) => d.api || d.api_ready);
@@ -557,22 +605,23 @@ function computeGap() {
   ];
   const verdict = gapVerdict(dlVector.length, apis.length, ogc.length, open.length);
   const cta = (dlVector.length === 0 && apis.length === 0)
-    ? `<div style="margin-top:16px"><a class="srcbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Generate with Studio ↗</a></div>`
+    ? `<div style="margin-top:16px"><a class="srcbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Explore Studio-assisted generation ↗</a></div>`
     : '';
   el.innerHTML = `<div class="gapcard">
     <h3>${esc(themeOf(theme).label)} — ${esc(state)}</h3>
     <div class="gapgrid">${stats.map(([k, v]) => `<div class="gapstat"><b>${v}</b><span>${esc(k)}</span></div>`).join('')}</div>
     ${verdict}
+    <p class="footnote">Gap analysis reflects this seed catalogue. "No suitable source is currently catalogued" is not the same as "no data exists."</p>
     ${cta}
   </div>`;
 }
 function gapVerdict(dl, api, ogc, open) {
   if (dl === 0 && api === 0 && ogc === 0) {
-    return `<div class="gapverdict gap">Data gap — insufficient authoritative open coverage for this geography. Consider Earth-observation or global open alternatives, or generate the layer from imagery with Studio.</div>`;
+    return `<div class="gapverdict gap"><b>Potential data gap.</b> No suitable downloadable/API/OGC source is currently catalogued for this theme and geography. Check alternative sources or consider Studio-assisted generation where technically appropriate.</div>`;
   } else if (dl === 0 || (open === 0 && dl > 0)) {
-    return `<div class="gapverdict partial">Partial coverage — data exists but is not openly downloadable (registration/restriction likely). Verify access at the source.</div>`;
+    return `<div class="gapverdict partial"><b>Partial / constrained coverage.</b> Relevant records are catalogued, but open download or access evidence is limited. Verify access and terms at the source.</div>`;
   }
-  return `<div class="gapverdict ok">Coverage available — ${dl} downloadable layer${dl === 1 ? '' : 's'}, ${api} API${api === 1 ? '' : 's'}, ${ogc} OGC service${ogc === 1 ? '' : 's'}.</div>`;
+  return `<div class="gapverdict ok"><b>Coverage available.</b> ${dl} downloadable layer${dl === 1 ? '' : 's'}, ${api} API${api === 1 ? '' : 's'} and ${ogc} OGC service${ogc === 1 ? '' : 's'} are currently catalogued.</div>`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -600,19 +649,19 @@ function computeCompare() {
     return { tier: t, label: SOURCE_CLASSES[t].label, color: SOURCE_CLASSES[t].color, count: ds.length, portals, has: ds.length > 0 };
   });
   el.innerHTML = `<table class="comp">
-    <thead><tr><th>Source tier</th><th>What's available</th><th>Coverage</th><th>Get it</th></tr></thead>
+    <thead><tr><th>Source category</th><th>Catalogued evidence</th><th>Coverage</th><th>Availability</th></tr></thead>
     <tbody>
     ${rows.map((r) => `<tr>
       <td><span class="tier"><span class="dot" style="background:${r.color}"></span>${esc(r.label)}</span></td>
-      <td>${r.has ? `${r.count} dataset${r.count === 1 ? '' : 's'} — ${r.portals.slice(0, 3).map(esc).join(', ')}${r.portals.length > 3 ? '…' : ''}` : '<span style="color:var(--muted)">None catalogued</span>'}</td>
+      <td>${r.has ? `${r.count} dataset${r.count === 1 ? '' : 's'} — representative portals: ${r.portals.slice(0, 3).map(esc).join(', ')}${r.portals.length > 3 ? '…' : ''}` : '<span style="color:var(--muted)">None currently catalogued</span>'}</td>
       <td>${r.has ? esc([...new Set(inTheme.filter((d) => d.source_class === r.tier).map((d) => d.coverage))].slice(0, 3).join(', ')) : '—'}</td>
       <td>${r.has ? '<button class="minbtn" data-tier="' + r.tier + '">Browse</button>' : '—'}</td>
     </tr>`).join('')}
-    <tr>
-      <td><span class="tier"><span class="dot" style="background:#f59e0b"></span>Studio-generated</span></td>
-      <td>On-demand extraction (footprints, change detection, land cover) from imagery via the Studio Workbench.</td>
-      <td>Any AOI</td>
-      <td><a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Create with Studio ↗</a></td>
+    <tr class="studio-row">
+      <td><span class="tier"><span class="dot" style="background:#f59e0b"></span>Studio-assisted generation</span></td>
+      <td>Where suitable public data is unavailable, Studio workflows can derive selected geospatial assets from imagery or other source data, subject to source availability, quality and project requirements.</td>
+      <td>Project-specific AOI</td>
+      <td><a class="minbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Explore with Studio ↗</a></td>
     </tr>
     </tbody></table>`;
   el.querySelectorAll('[data-tier]').forEach((b) => b.addEventListener('click', () => {
@@ -626,7 +675,7 @@ function computeCompare() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Ask Studio (natural-language, client-side v0.1)                    */
+/* Ask GeoIndia (natural-language catalogue synthesis)                 */
 /* ------------------------------------------------------------------ */
 function askStudio(query) {
   const q = query.toLowerCase();
@@ -658,9 +707,10 @@ function askStudio(query) {
   if (themes.length) detected.push('theme: ' + themes.map((t) => t.label).join(', '));
   if (state) detected.push('geography: ' + state);
   if (scope) detected.push('scope: ' + scope);
+  const coverageLabel = state || (scope === 'Global' ? 'Global' : 'All India / national');
 
   $('askResult').hidden = false;
-  $('askTitle').textContent = `Result for “${query}”`;
+  $('askTitle').textContent = `Catalogue result for "${query}"`;
   $('askBody').innerHTML = `
     ${detected.length ? `<p class="footnote" style="margin-bottom:12px">Detected ${detected.join(' · ')}</p>` : ''}
     <table class="cap-table">
@@ -669,15 +719,15 @@ function askStudio(query) {
       <tr><th>OGC services</th><td>${ogcN}</td></tr>
       <tr><th>APIs</th><td>${apiN}</td></tr>
       <tr><th>Formats</th><td>${fmts.length ? fmts.map(esc).join(', ') : '—'}</td></tr>
-      <tr><th>Coverage</th><td>${state || 'All India / national'}</td></tr>
+      <tr><th>Coverage</th><td>${esc(coverageLabel)}</td></tr>
       <tr><th>Access</th><td>${open} openly accessible · ${n - open} restricted/other</td></tr>
-      <tr><th>Link health</th><td>${live} live · ${n - live} unverified</td></tr>
+      <tr><th>Link health</th><td>${live} live · ${n - live} broken/down/unverified</td></tr>
       <tr><th>Freshness</th><td>${yrs.length ? Math.max(...yrs) : 'not recorded'}</td></tr>
-      <tr><th>Studio assessment</th><td>${ds.length ? Math.round(ds.reduce((a, d) => a + datasetScore(d), 0) / ds.length) : 0}/100 average</td></tr>
+      <tr><th>Usability score</th><td>${ds.length ? Math.round(ds.reduce((a, d) => a + datasetScore(d), 0) / ds.length) : 0}/100 average</td></tr>
     </table>
     <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
       <button class="ghostbtn" id="askBrowse">Browse these ${n} results</button>
-      <a class="ghostbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Analyse with Studio ↗</a>
+      <a class="ghostbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Analyse with Studio ↗</a>
     </div>`;
   $('askBrowse').addEventListener('click', () => {
     S.theme = themes.length === 1 ? themes[0].id : null;
@@ -702,7 +752,7 @@ const AGENTS = [
   ['Verification', 'Checks links and endpoints, records evidence.'],
   ['Quality', 'Scores metadata completeness and usability.'],
   ['Classification', 'Normalises themes, geographies and organisations.'],
-  ['Change', 'Detects portal and dataset changes.'],
+  ['Roadmap: change monitoring', 'Future platform direction for portal, endpoint and dataset-change signals.'],
   ['Provenance', 'Stores source, evidence and date for every assertion.'],
   ['Human review', 'Flags uncertain classifications for sign-off.'],
   ['Publishing', 'Updates the open GitHub catalogue.'],
@@ -712,7 +762,7 @@ function renderAgents() {
 }
 
 const METHODOLOGY = [
-  ['Scoring', 'Portals are scored 0–100 from catalogued records: open & free access (20), download capability (25), GIS-ready formats (15), API & OGC services (15), data recency (15), link reliability (10).'],
+  ['Scoring', 'Portals are scored 0–100 from catalogued evidence: open & free access (20), download capability (25), GIS-ready formats (15), API & OGC services (15), data recency (15), link reliability (10). Dataset usability uses machine readability, GIS readiness, downloadability, APIs and recency.'],
   ['Classification', 'Source classes are fixed: Government (authoritative), Open community (OSM/DataMeet), Global open (international), Earth observation (satellite-derived). Themes roll up to 16 fixed groups.'],
   ['Verification', 'Links are checked against HTTP status; live, redirects, broken and unverified are recorded with a timestamp. Access and licence are classified from source evidence, not legal review.'],
   ['Provenance', 'Every assertion carries its source and verification date. Uncertain records are flagged for human review before being published.'],
@@ -727,7 +777,8 @@ function renderMethodology() {
 function downloadCSV() {
   const cols = ['id', 'title', 'portal', 'agency', 'theme', 'coverage', 'state', 'formats', 'access_tier', 'licence', 'url', 'source_class', 'published_year', 'updated_year', 'link_health'];
   const head = cols.join(',');
-  const rows = S.data.map((d) => {
+  const current = sortData(filtered());
+  const rows = current.map((d) => {
     const p = portalOf(d.portal);
     return cols.map((c) => {
       let v;
@@ -740,12 +791,17 @@ function downloadCSV() {
     }).join(',');
   });
   const csv = '\uFEFF' + [head, ...rows].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'nebula-civic-index-geoindia-datasets.csv';
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'geoindia-current-view.csv';
+  a.style.display = 'none';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(a.href);
+  setTimeout(() => {
+    a.remove();
+  }, 0);
+  const status = $('downloadStatus');
+  if (status) status.textContent = `Prepared geoindia-current-view.csv with ${current.length} dataset${current.length === 1 ? '' : 's'}.`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -774,7 +830,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function setMode(m) {
     S.mode = m;
     document.querySelectorAll('.mode').forEach((x) => x.classList.toggle('active', x.dataset.mode === m));
-    document.querySelectorAll('.mode').forEach((x) => x.setAttribute('aria-selected', x.dataset.mode === m));
+    document.querySelectorAll('.mode').forEach((x) => x.setAttribute('aria-pressed', x.dataset.mode === m));
     $('askBtn').setAttribute('aria-pressed', m === 'ask');
     if (m === 'ask') {
       $('askResult').hidden = false;

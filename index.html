@@ -3,17 +3,41 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nebula Civic Index — GeoIndia · Open Public Geospatial Data for India</title>
-<meta name="description" content="An open index of public geospatial datasets, services and portals for India — assembled and verified with a Studio-assisted workflow and human review.">
+<title>GeoIndia — Public Geospatial Data Intelligence for India | Nebula Civic Index</title>
+<meta name="description" content="Discover and assess public geospatial datasets, portals and services across India. Compare sources, verify access and provenance, identify data gaps and move into analysis with NebulaCloud Studio.">
+<link rel="canonical" href="https://studio-public-demos.github.io/civic-index-india-geoportal/">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#16324a">
+<meta property="og:title" content="GeoIndia — Public Geospatial Data Intelligence for India">
+<meta property="og:description" content="Discover public geospatial datasets, services and portals across India; assess access, provenance and usability; compare sources; identify gaps; and act with NebulaCloud Studio.">
+<meta property="og:url" content="https://studio-public-demos.github.io/civic-index-india-geoportal/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GeoIndia — Public Geospatial Data Intelligence for India">
+<meta name="twitter:description" content="Find, verify, compare and act on India's fragmented public geospatial data.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/styles.css">
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Nebula Civic Index — GeoIndia",
+  "url": "https://studio-public-demos.github.io/civic-index-india-geoportal/",
+  "description": "An open intelligence layer for India's fragmented public geospatial data.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Nebula Cloud Public Good Labs",
+    "url": "https://nebulacloud.studio"
+  }
+}
+</script>
 </head>
 <body>
-<a class="skip" href="#datasets">Skip to datasets</a>
+<a class="skip" href="#explore">Skip to search and filters</a>
 
 <header class="masthead">
   <div class="wrap">
@@ -24,21 +48,22 @@
         <span class="brand-sub">GeoIndia · by Nebula Cloud Public Good Labs</span>
       </div>
     </div>
-    <h1>India's public geospatial data, <span class="accent">one search away</span>.</h1>
-    <p class="lede"><strong>Discover. Verify. Understand. Use.</strong> — an open index of public geospatial
-       datasets, services and portals for India, assembled and verified with a
-       <strong>Studio-assisted</strong> discovery, classification and verification workflow, with human
-       review. It is an open resource, not a data store: every record points to the authoritative source.</p>
+    <h1>Find the data. Know whether to trust it. See what's missing.</h1>
+    <p class="lede">GeoIndia is an open intelligence layer for India's fragmented public geospatial data. Discover datasets, services and portals; assess access, freshness and provenance; compare authoritative and alternative sources; identify coverage gaps; and move into analysis with NebulaCloud Studio.</p>
+    <div class="journey" aria-label="GeoIndia workflow">
+      <span>Find</span><i aria-hidden="true"></i><span>Verify</span><i aria-hidden="true"></i><span>Compare</span><i aria-hidden="true"></i><span>Act</span>
+    </div>
+    <p class="trustline">Open catalogue · Source terms govern · Underlying datasets are not re-hosted</p>
 
     <form class="searchbar" id="searchForm" role="search">
-      <input type="search" id="queryInput" placeholder="What data are you looking for? e.g. building footprints Telangana"
+      <input type="search" id="queryInput" placeholder="Search building footprints, DEM, land use, roads, flood data..."
              aria-label="Search datasets" autocomplete="off">
       <button type="submit" class="search-btn">Search</button>
-      <button type="button" class="ask-btn" id="askBtn" aria-pressed="false">Ask Studio</button>
+      <button type="button" class="ask-btn" id="askBtn" aria-pressed="false">Ask GeoIndia</button>
     </form>
-    <div class="searchmodes" role="tablist" aria-label="Search mode">
-      <button role="tab" aria-selected="true" data-mode="search" class="mode active">Browse &amp; filter</button>
-      <button role="tab" aria-selected="false" data-mode="ask" class="mode">Ask Studio <span class="pil">AI</span></button>
+    <div class="searchmodes" role="group" aria-label="Search mode">
+      <button type="button" aria-pressed="true" data-mode="search" class="mode active">Browse &amp; filter</button>
+      <button type="button" aria-pressed="false" data-mode="ask" class="mode">Ask catalogue <span class="pil">Metadata</span></button>
     </div>
 
     <div class="kpi" id="kpiStrip" aria-live="polite">
@@ -47,6 +72,7 @@
       <div class="kpi-item"><b id="kpiAgencies">–</b><span>agencies</span></div>
       <div class="kpi-item"><b id="kpiThemes">–</b><span>themes</span></div>
       <div class="kpi-item"><b id="kpiVerified">–</b><span>links live</span></div>
+      <div class="kpi-item"><b id="kpiLastVerified">–</b><span>latest link check</span></div>
     </div>
   </div>
 </header>
@@ -54,13 +80,14 @@
 <nav class="jumpbar" aria-label="Sections">
   <div class="wrap">
     <a href="#explore">Explore</a>
-    <a href="#map">Map</a>
+    <a href="#map-section">Map</a>
     <a href="#datasets">Datasets</a>
     <a href="#assessment">Assessment</a>
     <a href="#gaps">Data gaps</a>
-    <a href="#compare">Sources</a>
-    <a href="#how">How it works</a>
-    <a href="#labs">Initiative</a>
+    <a href="#compare">Compare sources</a>
+    <a href="#delivery">Delivery</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#labs">Public Good Labs</a>
   </div>
 </nav>
 
@@ -70,7 +97,7 @@
     <div class="wrap">
       <p class="eyebrow">Explore</p>
       <h2>Search by geography or theme</h2>
-      <p class="sub">Filter once and every view below updates together. Or ask Studio in plain language.</p>
+      <p class="sub">Filter once and every view below updates together. Or ask the catalogue in plain language for a metadata synthesis.</p>
 
       <div class="themestrip" id="themeChips" role="group" aria-label="Filter by theme"></div>
 
@@ -96,7 +123,7 @@
           <div class="pillrow" id="formatRow"></div>
         </div>
         <div class="fctrl">
-          <span class="flabel">Coverage (state/UT)</span>
+          <label class="flabel" for="stateSelect">Coverage (state/UT)</label>
           <select id="stateSelect" class="sel"><option value="">All India / any</option></select>
         </div>
       </div>
@@ -105,28 +132,43 @@
     </div>
   </section>
 
-  <!-- Ask Studio result -->
+  <section id="intelligence" class="section">
+    <div class="wrap">
+      <p class="eyebrow">Intelligence layer</p>
+      <h2>What GeoIndia tells you</h2>
+      <div class="intelgrid">
+        <article><h3>What exists?</h3><p>Datasets, services, APIs and portals.</p></article>
+        <article><h3>Can I use it?</h3><p>Access, licence signals, formats and downloadability.</p></article>
+        <article><h3>Can I trust it?</h3><p>Source provenance, verification and link health.</p></article>
+        <article><h3>Is it current?</h3><p>Publication, update and freshness evidence where available.</p></article>
+        <article><h3>What are the alternatives?</h3><p>Government, community, global-open and Earth-observation sources.</p></article>
+        <article><h3>What's missing?</h3><p>Coverage and usability gaps based on catalogued evidence.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ask GeoIndia result -->
   <section id="askResult" class="section pale askresult" hidden>
     <div class="wrap">
       <div class="askcard">
         <div class="askhead">
-          <span class="askmark">Studio</span>
+          <span class="askmark">Catalogue assistant</span>
           <h2 id="askTitle">Synthesized result</h2>
         </div>
         <div class="askbody" id="askBody"></div>
-        <div class="askfoot">Prototype Studio assistant (client-side v0.1). Production uses the Studio agent pipeline.</div>
+        <div class="askfoot">This public catalogue assistant synthesizes indexed GeoIndia metadata. It does not execute a live Studio mission.</div>
       </div>
     </div>
   </section>
 
   <!-- Map -->
-  <section id="map" class="section">
+  <section id="map-section" class="section">
     <div class="wrap">
       <div class="mapgrid">
         <div class="card">
           <div class="rankhead"><h3>Datasets by state / UT</h3><button class="linkbtn" id="mapReset">Reset map</button></div>
           <p class="sub" id="mapSub">Shaded by count in view — click a state to filter.</p>
-          <div id="map" aria-label="Map of India showing datasets by state"></div>
+          <div id="map" role="region" tabindex="0" aria-label="Interactive map of India showing catalogued datasets by state or union territory" aria-describedby="mapSub"></div>
           <div class="legend">
             <div class="legendbar"></div>
             <div class="legendlabels"><span>Fewer</span><span>More</span></div>
@@ -136,7 +178,7 @@
         <div class="card" id="mapDrill">
           <h3>Reading the map</h3>
           <p class="sub">Colour scale &amp; caveats</p>
-          <p class="footnote">National, multi-state and global records aren't attributed to a single state, so they aren't shaded here — they still count in the KPIs and the assessment. Select a state to see what's available for it, and use the gap analysis below to spot missing coverage.</p>
+          <p class="footnote">National, multi-state and global records are not attributed to a single state, so they are not shaded here. They still count in KPIs and assessment. Select a state to see what is catalogued for it, and use the gap analysis below to inspect evidence gaps.</p>
           <div id="stateSummary"></div>
         </div>
       </div>
@@ -159,7 +201,7 @@
               <option value="title">Title A–Z</option>
               <option value="portal">Portal</option>
               <option value="updated">Most recent</option>
-              <option value="score">Studio score</option>
+              <option value="score">Dataset usability</option>
             </select>
             <label for="perSelect">Show</label>
             <select id="perSelect" class="sel" style="min-width:70px">
@@ -168,7 +210,8 @@
               <option value="100">100</option>
             </select>
           </div>
-          <button class="ghostbtn" id="downloadBtn">Download catalogue</button>
+          <button class="ghostbtn" id="downloadBtn">Download current view</button>
+          <span class="srstatus" id="downloadStatus" aria-live="polite"></span>
         </div>
       </div>
       <div id="nudgeSlot"></div>
@@ -182,8 +225,8 @@
     <div class="wrap">
       <div class="grid2">
         <div class="card">
-          <div class="rankhead"><h3>Portal assessment</h3></div>
-          <p class="sub">Scored on open access, download capability, GIS-ready formats, recency, APIs and link reliability — click to drill in.</p>
+          <div class="rankhead"><h3>GeoIndia portal assessment</h3></div>
+          <p class="sub">Comparative usability score based on catalogued evidence, not an official rating. Click to drill in.</p>
           <div id="portalScores"></div>
           <details class="disclose">
             <summary>How scores are computed</summary>
@@ -200,10 +243,10 @@
     <div class="wrap">
       <p class="eyebrow">Public-data observatory</p>
       <h2>Data availability gap analysis</h2>
-      <p class="sub">Pick a theme and a state to see authoritative vs open coverage, and where the gaps are.</p>
+      <p class="sub">Pick a theme and a state to ask: does an authoritative source exist, is it openly accessible, is it downloadable or API-ready, are alternatives catalogued, and what is the next option?</p>
       <div class="gapcontrols">
-        <div class="fctrl"><span class="flabel">Theme</span><select id="gapTheme" class="sel"></select></div>
-        <div class="fctrl"><span class="flabel">State / UT</span><select id="gapState" class="sel"></select></div>
+        <div class="fctrl"><label class="flabel" for="gapTheme">Theme</label><select id="gapTheme" class="sel"></select></div>
+        <div class="fctrl"><label class="flabel" for="gapState">State / UT</label><select id="gapState" class="sel"></select></div>
       </div>
       <div id="gapResult"></div>
     </div>
@@ -214,9 +257,38 @@
     <div class="wrap">
       <p class="eyebrow">Authoritative vs alternatives</p>
       <h2>Compare authoritative and alternative sources</h2>
-      <p class="sub">For a given asset class, see what's available from government, the open community, global open data and Earth observation — and what Studio can generate.</p>
-      <div class="fctrl"><span class="flabel">Asset class</span><select id="compareTheme" class="sel"></select></div>
+      <p class="sub">Compare what government publishes with community, global-open and Earth-observation alternatives, then understand whether Studio-assisted generation may be appropriate.</p>
+      <div class="fctrl"><label class="flabel" for="compareTheme">Asset class</label><select id="compareTheme" class="sel"></select></div>
       <div id="compareResult"></div>
+    </div>
+  </section>
+
+  <section id="delivery" class="section pale">
+    <div class="wrap">
+      <p class="eyebrow">From discovery to delivery</p>
+      <h2>The Civic Index stays open. Nebula Cloud's commercial services begin where discovery ends.</h2>
+      <div class="deliverygrid">
+        <article class="deliverycard">
+          <h3>Analyse with Studio</h3>
+          <p>Take relevant datasets into Studio-assisted GIS, data and AI workflows for transformation, geospatial analysis, comparison, mapping, reporting and execution.</p>
+          <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Explore NebulaCloud Studio ↗</a>
+        </article>
+        <article class="deliverycard">
+          <h3>Data readiness &amp; managed intelligence</h3>
+          <p>Source relevant data, assess availability, verify access, normalize CRS/schema/formats, package analysis-ready datasets and identify project or tender data risks.</p>
+          <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Learn about managed intelligence ↗</a>
+        </article>
+        <article class="deliverycard">
+          <h3>Generate what's missing</h3>
+          <p>Where suitable public data is unavailable, Studio workflows can support derivation of selected assets such as building footprints, land-use / land-cover, change detection and terrain products, subject to source availability and project requirements.</p>
+          <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Generate with Studio ↗</a>
+        </article>
+        <article class="deliverycard">
+          <h3>Private Data Observatory</h3>
+          <p>Use the same pattern for internal and public datasets, metadata cataloguing, provenance, quality signals and organisation-specific data intelligence in private deployments, with source monitoring treated as a roadmap capability.</p>
+          <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Explore enterprise possibilities ↗</a>
+        </article>
+      </div>
     </div>
   </section>
 
@@ -227,12 +299,12 @@
       <h2>Assembled with Studio, reviewed by people</h2>
       <p class="lede">The catalogue is assembled from primary sources — government portals, open-data platforms,
          community data and international repositories — using a Studio-assisted discovery, classification and
-         verification workflow, with human review for uncertain records. Fully autonomous scheduled maintenance
-         is under development.</p>
+         verification workflow, with human review for uncertain records. Autonomous scheduled maintenance is part
+         of the platform roadmap.</p>
       <div class="agents" id="agentsGrid"></div>
       <div class="cav">
-        <div><span class="code">01</span>This is a <b>discovery layer</b>, not a data host. Nothing is re-served; every record links to the source, and the source's terms govern.</div>
-        <div><span class="code">02</span><b>Licence and access</b> are classified from source evidence and can mislead — always confirm at the source before use.</div>
+        <div><span class="code">01</span>This is a <b>discovery layer</b>, not a data host. Underlying datasets are not re-hosted; every record links to the source, and the source's terms govern.</div>
+        <div><span class="code">02</span><b>Licence and access</b> classifications are informational. Confirm source terms before production or commercial use.</div>
         <div><span class="code">03</span><b>Provenance first.</b> Every assertion carries its source, evidence and verification timestamp.</div>
         <div><span class="code">04</span>The catalogue is <b>open data</b> — downloadable as JSON/CSV under an open licence.</div>
       </div>
@@ -253,13 +325,13 @@
       <div class="labsband">
         <p class="eyebrow">The initiative</p>
         <h2>Nebula Cloud Public Good Labs</h2>
-        <p class="sub">Applying AI, cloud computing and open technologies to public-interest data, research and digital infrastructure.</p>
+        <p class="sub">Applying AI, cloud computing and open technologies to public-interest data, research and digital infrastructure. GeoIndia is live; the adjacent domains are planned or being explored.</p>
         <div class="domains">
-          <div class="domain live"><b>GeoIndia</b><span>Geospatial data discovery — flagship, live</span></div>
-          <div class="domain"><b>ClimateIndia</b><span>Climate &amp; environment</span></div>
-          <div class="domain"><b>UrbanIndia</b><span>Municipal &amp; urban data</span></div>
-          <div class="domain"><b>AgriIndia</b><span>Agriculture &amp; food systems</span></div>
-          <div class="domain"><b>HeritageIndia</b><span>Cultural &amp; heritage data</span></div>
+          <div class="domain live"><b>GeoIndia</b><span>Geospatial data intelligence</span><em>Live</em></div>
+          <div class="domain"><b>ClimateIndia</b><span>Climate &amp; environment</span><em>Exploring</em></div>
+          <div class="domain"><b>UrbanIndia</b><span>Municipal &amp; urban data</span><em>Planned</em></div>
+          <div class="domain"><b>AgriIndia</b><span>Agriculture &amp; food systems</span><em>Planned</em></div>
+          <div class="domain"><b>HeritageIndia</b><span>Cultural &amp; heritage data</span><em>Exploring</em></div>
         </div>
       </div>
     </div>
@@ -269,8 +341,8 @@
 <footer class="foot">
   <div class="wrap">
     <p class="footline">Nebula Civic Index — GeoIndia is an open public-data initiative by <strong>Nebula Cloud Public Good Labs</strong>.</p>
-    <p class="footcopy">Catalogue data is openly licensed and downloadable. Boundaries: Natural Earth (public domain). Basemap: © OpenStreetMap contributors, © CARTO.</p>
-    <footer style="text-align:center;padding:12px;margin-top:24px;opacity:0.5;font-size:11px;font-family:system-ui;color:#666;"><a href="https://nebulacloud.studio" style="color:#3b82f6;text-decoration:none;">Built with NebulaCloud Studio</a></footer>
+    <p class="footcopy">GeoIndia is an independent public-good initiative and is not an official Government of India portal. Catalogue metadata is openly licensed and downloadable. Source terms govern underlying datasets. Boundaries: Natural Earth (public domain). Basemap: © OpenStreetMap contributors, © CARTO.</p>
+    <p class="studiofoot"><a href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Built with NebulaCloud Studio</a></p>
   </div>
 </footer>
 
