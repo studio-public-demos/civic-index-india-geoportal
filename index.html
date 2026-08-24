@@ -12,9 +12,14 @@
 <meta property="og:description" content="Discover public geospatial datasets, services and portals across India; assess access, provenance and usability; compare sources; identify gaps; and act with NebulaCloud Studio.">
 <meta property="og:url" content="https://studio-public-demos.github.io/civic-index-india-geoportal/">
 <meta property="og:type" content="website">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://studio-public-demos.github.io/civic-index-india-geoportal/assets/images/geoindia-social.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="GeoIndia — Public Geospatial Data Intelligence for India">
 <meta name="twitter:description" content="Find, verify, compare and act on India's fragmented public geospatial data.">
+<meta name="twitter:image" content="https://studio-public-demos.github.io/civic-index-india-geoportal/assets/images/geoindia-social.png">
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -58,13 +63,9 @@
     <form class="searchbar" id="searchForm" role="search">
       <input type="search" id="queryInput" placeholder="Search building footprints, DEM, land use, roads, flood data..."
              aria-label="Search datasets" autocomplete="off">
-      <button type="submit" class="search-btn">Search</button>
+      <button type="submit" class="search-btn">Search catalogue</button>
       <button type="button" class="ask-btn" id="askBtn" aria-pressed="false">Ask GeoIndia</button>
     </form>
-    <div class="searchmodes" role="group" aria-label="Search mode">
-      <button type="button" aria-pressed="true" data-mode="search" class="mode active">Browse &amp; filter</button>
-      <button type="button" aria-pressed="false" data-mode="ask" class="mode">Ask catalogue <span class="pil">Metadata</span></button>
-    </div>
 
     <div class="kpi" id="kpiStrip" aria-live="polite">
       <div class="kpi-item"><b id="kpiDatasets">–</b><span>datasets</span></div>
@@ -86,6 +87,8 @@
     <a href="#gaps">Data gaps</a>
     <a href="#compare">Compare sources</a>
     <a href="#delivery">Delivery</a>
+    <a href="#partner">Partner</a>
+    <a href="#next">What's next</a>
     <a href="#methodology">Methodology</a>
     <a href="#labs">Public Good Labs</a>
   </div>
@@ -167,7 +170,7 @@
       <div class="mapgrid">
         <div class="card">
           <div class="rankhead"><h3>Datasets by state / UT</h3><button class="linkbtn" id="mapReset">Reset map</button></div>
-          <p class="sub" id="mapSub">Shaded by count in view — click a state to filter.</p>
+          <p class="sub" id="mapSub">Shaded by single-state records in view — click a state to filter. State filtering includes state-specific, national and applicable global sources.</p>
           <div id="map" role="region" tabindex="0" aria-label="Interactive map of India showing catalogued datasets by state or union territory" aria-describedby="mapSub"></div>
           <div class="legend">
             <div class="legendbar"></div>
@@ -220,6 +223,14 @@
     </div>
   </section>
 
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="dataset-drawer" id="datasetDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
+    <div class="drawer-shell">
+      <button class="drawer-close" id="drawerClose" type="button" aria-label="Close dataset details">×</button>
+      <div id="drawerContent"></div>
+    </div>
+  </aside>
+
   <!-- Assessment -->
   <section id="assessment" class="section">
     <div class="wrap">
@@ -270,24 +281,41 @@
       <div class="deliverygrid">
         <article class="deliverycard">
           <h3>Analyse with Studio</h3>
+          <span class="status-badge status-nebula">Available via Nebula</span>
           <p>Take relevant datasets into Studio-assisted GIS, data and AI workflows for transformation, geospatial analysis, comparison, mapping, reporting and execution.</p>
           <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Explore NebulaCloud Studio ↗</a>
         </article>
         <article class="deliverycard">
           <h3>Data readiness &amp; managed intelligence</h3>
+          <span class="status-badge status-nebula">Available via Nebula</span>
           <p>Source relevant data, assess availability, verify access, normalize CRS/schema/formats, package analysis-ready datasets and identify project or tender data risks.</p>
           <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Learn about managed intelligence ↗</a>
         </article>
         <article class="deliverycard">
           <h3>Generate what's missing</h3>
+          <span class="status-badge status-nebula">Available via Nebula</span>
           <p>Where suitable public data is unavailable, Studio workflows can support derivation of selected assets such as building footprints, land-use / land-cover, change detection and terrain products, subject to source availability and project requirements.</p>
           <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Generate with Studio ↗</a>
         </article>
         <article class="deliverycard">
           <h3>Private Data Observatory</h3>
-          <p>Use the same pattern for internal and public datasets, metadata cataloguing, provenance, quality signals and organisation-specific data intelligence in private deployments, with source monitoring treated as a roadmap capability.</p>
+          <span class="status-badge status-nebula">Available via Nebula</span>
+          <p>Use the same pattern for internal and public datasets, metadata cataloguing, provenance, quality signals and organisation-specific data intelligence in private deployments.</p>
           <a class="minbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Explore enterprise possibilities ↗</a>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="partner" class="section">
+    <div class="wrap">
+      <p class="eyebrow">Partner with Nebula</p>
+      <h2>Turn public-data discovery into operational delivery.</h2>
+      <p class="sub">GeoIndia is live as an open discovery and intelligence layer. NebulaCloud Studio and managed services are available for teams that need assisted analysis, packaging, validation, reporting or project-specific derived data.</p>
+      <div class="partner-actions">
+        <a class="ghostbtn" href="https://nebulacloud.studio" target="_blank" rel="noopener noreferrer">Open NebulaCloud Studio ↗</a>
+        <span class="status-badge status-live">Live catalogue</span>
+        <span class="status-badge status-nebula">Available via Nebula</span>
       </div>
     </div>
   </section>
@@ -307,6 +335,19 @@
         <div><span class="code">02</span><b>Licence and access</b> classifications are informational. Confirm source terms before production or commercial use.</div>
         <div><span class="code">03</span><b>Provenance first.</b> Every assertion carries its source, evidence and verification timestamp.</div>
         <div><span class="code">04</span>The catalogue is <b>open data</b> — downloadable as JSON/CSV under an open licence.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="next" class="section pale">
+    <div class="wrap">
+      <p class="eyebrow">What's next</p>
+      <h2>Launch now; keep larger platform capabilities on the roadmap.</h2>
+      <div class="roadmapgrid">
+        <article><span class="status-badge status-coming">Coming soon</span><h3>Direct Studio handoff</h3><p>Send a selected dataset or filtered catalogue view into a live Studio workspace.</p></article>
+        <article><span class="status-badge status-coming">Coming soon</span><h3>Source monitoring</h3><p>Scheduled checks for portal, endpoint and dataset-change signals.</p></article>
+        <article><span class="status-badge status-coming">Coming soon</span><h3>APIs and authenticated execution</h3><p>Programmatic catalogue access and authenticated workflows for partner deployments.</p></article>
+        <article><span class="status-badge status-planned">Exploring / planned</span><h3>Additional Civic Index domains</h3><p>Climate, urban, agriculture and heritage data intelligence initiatives.</p></article>
       </div>
     </div>
   </section>

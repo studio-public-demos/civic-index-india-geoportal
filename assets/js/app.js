@@ -39,10 +39,11 @@ const THEME_SYNONYMS = {
 /* ------------------------------------------------------------------ */
 const S = {
   data: null, portals: null, themes: null, orgs: null, statesGeo: null,
-  q: '', mode: 'search',
+  q: '',
   theme: null, scopes: [], providers: [], access: [], formats: [], srcClasses: [], state: null,
+  matchIds: null, askQuery: '',
   sort: 'score', per: 20, page: 1,
-  panel: null, map: null,
+  panel: null, map: null, mapReady: false, mapFailed: false, lastFocus: null,
 };
 const BOUND = {};
 
@@ -96,11 +97,26 @@ function datasetScore(d) {
   return s;
 }
 
+function isRelevantToState(d, state) {
+  if (!state) return true;
+  if (d.state === state || d.coverage === state) return true;
+  if (d.coverage === 'All India' || d.coverage === 'Global') return true;
+  return false;
+}
+
+function clearAskMatch() {
+  S.matchIds = null;
+  S.askQuery = '';
+  const askBtn = $('askBtn');
+  if (askBtn) askBtn.setAttribute('aria-pressed', 'false');
+}
+
 function filtered() {
   if (!S.data) return [];
   let out = S.data.slice();
+  if (S.matchIds) out = out.filter((d) => S.matchIds.has(d.id));
   if (S.theme) out = out.filter((d) => d.theme === S.theme);
-  if (S.state) out = out.filter((d) => d.state === S.state);
+  if (S.state) out = out.filter((d) => isRelevantToState(d, S.state));
   if (S.scopes.length) out = out.filter((d) => S.scopes.includes(portalOf(d.portal).scope));
   if (S.providers.length) out = out.filter((d) => S.providers.includes(orgOf(portalOf(d.portal).organisation).type));
   if (S.access.length) out = out.filter((d) => S.access.includes(d.access_tier));
@@ -194,10 +210,11 @@ function renderThemeChips() {
   const el = $('themeChips');
   el.innerHTML = S.themes.map((t) => {
     const n = S.data.filter((d) => d.theme === t.id).length;
-    return `<button class="tchip" data-theme="${t.id}" aria-pressed="${S.theme === t.id}" title="${esc(t.blurb)}">${esc(t.label)} <span class="n">${n}</span></button>`;
+    return `<button class="tchip" type="button" data-theme="${t.id}" aria-pressed="${S.theme === t.id}" title="${esc(t.blurb)}">${esc(t.label)} <span class="n">${n}</span></button>`;
   }).join('');
   el.querySelectorAll('.tchip').forEach((b) => b.addEventListener('click', () => {
     S.theme = S.theme === b.dataset.theme ? null : b.dataset.theme;
+    clearAskMatch();
     S.page = 1; renderThemeChips(); renderList(); renderMap(); renderActiveBar();
   }));
 }
@@ -208,11 +225,12 @@ function renderThemeChips() {
 function pills(rowId, values, selected, labels, onChange) {
   const el = $(rowId);
   el.innerHTML = values.map((v) =>
-    `<button class="pill" data-v="${esc(v)}" aria-pressed="${selected.includes(v)}">${esc(labels ? labels[v] : v)}</button>`).join('');
+    `<button class="pill" type="button" data-v="${esc(v)}" aria-pressed="${selected.includes(v)}">${esc(labels ? labels[v] : v)}</button>`).join('');
   el.querySelectorAll('.pill').forEach((b) => b.addEventListener('click', () => {
     const v = b.dataset.v;
     if (selected.includes(v)) selected.splice(selected.indexOf(v), 1);
     else selected.push(v);
+    clearAskMatch();
     S.page = 1; onChange(); renderPills(); renderList(); renderMap(); renderActiveBar();
   }));
 }
@@ -245,6 +263,7 @@ function renderActiveBar() {
   if (S.theme) parts.push({ k: 'Theme', v: themeOf(S.theme).label, clear: () => { S.theme = null; } });
   if (S.state) parts.push({ k: 'State', v: S.state, clear: () => { S.state = null; } });
   if (S.q) parts.push({ k: 'Search', v: S.q, clear: () => { S.q = ''; $('queryInput').value = ''; } });
+  if (S.matchIds) parts.push({ k: 'Ask', v: S.askQuery || 'matching catalogue', clear: clearAskMatch });
   S.scopes.forEach((v) => parts.push({ k: 'Scope', v, clear: () => S.scopes.splice(S.scopes.indexOf(v), 1) }));
   S.providers.forEach((v) => parts.push({ k: 'Provider', v, clear: () => S.providers.splice(S.providers.indexOf(v), 1) }));
   S.access.forEach((v) => parts.push({ k: 'Access', v, clear: () => S.access.splice(S.access.indexOf(v), 1) }));
@@ -253,7 +272,7 @@ function renderActiveBar() {
   const el = $('activeBar');
   if (!parts.length) { el.innerHTML = ''; return; }
   el.innerHTML = '<span class="lead">Active filters</span>' + parts.map((p) =>
-    `<button class="fchip" data-k="${esc(p.k)}"><span class="fk">${esc(p.k)}</span>${esc(p.v)} <span class="x">×</span></button>`).join('');
+    `<button class="fchip" type="button" data-k="${esc(p.k)}"><span class="fk">${esc(p.k)}</span>${esc(p.v)} <span class="x" aria-hidden="true">×</span></button>`).join('');
   el.querySelectorAll('.fchip').forEach((b) => b.addEventListener('click', () => {
     const p = parts[Array.from(el.children).indexOf(b) - 1];
     p.clear(); S.page = 1; renderAll();
@@ -295,7 +314,8 @@ function renderList() {
           <div class="secbtns">
             <a class="srcbtn" href="${esc(safeExternalUrl(d.url))}" target="_blank" rel="noopener noreferrer">View source ↗</a>
             <button class="minbtn" data-open="${esc(d.id)}">Inspect</button>
-            <a class="minbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Analyse with Studio ↗</a>
+            <a class="minbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Open NebulaCloud Studio ↗</a>
+            <span class="status-badge status-coming">Direct dataset handoff — Coming soon</span>
           </div>
         </div>
       </article>`;
@@ -338,11 +358,16 @@ function openDetail(id) {
   const o = orgOf(p.organisation);
   const sc = SOURCE_CLASSES[d.source_class];
   const score = datasetScore(d);
-  S.panel = d;
-  $('panel').innerHTML = `
+  S.lastFocus = document.activeElement;
+  const geoAction = d.state
+    ? `<button class="minbtn" data-map="${esc(d.id)}">Locate on map</button>`
+    : d.coverage === 'All India'
+      ? `<button class="minbtn" data-map="${esc(d.id)}">View India coverage context</button>`
+      : '';
+  $('drawerContent').innerHTML = `
     <div class="panel-head">
       <span class="eyebrow">Dataset</span>
-      <h3>${esc(d.title)}</h3>
+      <h3 id="drawerTitle">${esc(d.title)}</h3>
       <div class="meta">${esc(p.name)} · ${esc(o.name)}</div>
     </div>
     <div class="panel-body">
@@ -360,16 +385,28 @@ function openDetail(id) {
       <div class="next-actions">
         <h4>What can I do next?</h4>
         <div class="secbtns">
-          <a class="srcbtn" href="${esc(safeExternalUrl(d.url))}" target="_blank" rel="noopener noreferrer">View authoritative/source page ↗</a>
-          <button class="minbtn" data-open="${esc(d.id)}">Inspect metadata</button>
-          <button class="minbtn" data-map="${esc(d.id)}">Locate geography on map</button>
-          <a class="minbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Analyse with Studio ↗</a>
+          <a class="srcbtn" href="${esc(safeExternalUrl(d.url))}" target="_blank" rel="noopener noreferrer">View source ↗</a>
+          ${geoAction}
+          <a class="minbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Open NebulaCloud Studio ↗</a>
+          <span class="status-badge status-coming">Direct dataset handoff — Coming soon</span>
         </div>
       </div>
     </div>`;
-  $('panel').querySelector('[data-map]').addEventListener('click', () => openInMap(d.id));
-  $('panel').querySelector('[data-open]').addEventListener('click', () => $('panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
-  $('panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  $('datasetDrawer').hidden = false;
+  $('drawerBackdrop').hidden = false;
+  document.body.classList.add('drawer-open');
+  const mapBtn = $('drawerContent').querySelector('[data-map]');
+  if (mapBtn) mapBtn.addEventListener('click', () => { closeDetail(); openInMap(d.id); });
+  $('drawerClose').focus();
+}
+
+function closeDetail() {
+  $('datasetDrawer').hidden = true;
+  $('drawerBackdrop').hidden = true;
+  document.body.classList.remove('drawer-open');
+  $('drawerContent').innerHTML = '';
+  if (S.lastFocus && typeof S.lastFocus.focus === 'function') S.lastFocus.focus();
+  S.lastFocus = null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -390,11 +427,16 @@ function geojsonBBox(geom) {
 }
 
 function updateMapPaint() {
+  if (!S.map || !S.mapReady || !S.map.getLayer('states-fill')) return;
   S.map.setPaintProperty('states-fill', 'fill-color', fillExpr());
   S.map.setFilter('states-sel', ['==', ['get', 'name'], S.state || '__none__']);
 }
 
 function renderMap() {
+  if (S.mapFailed) {
+    renderMapFallback();
+    return;
+  }
   const list = filtered();
   const counts = stateCounts(list);
   const geo = JSON.parse(JSON.stringify(S.statesGeo));
@@ -407,42 +449,74 @@ function renderMap() {
 
   const container = $('map');
   if (!S.map) {
-    S.map = new maplibregl.Map({
-      container,
-      style: {
-        version: 8,
-        sources: {
-          base: { type: 'raster', tiles: ['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', 'https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', 'https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'], tileSize: 256, attribution: '&copy; OpenStreetMap contributors &copy; CARTO' },
-          states: { type: 'geojson', data: geo },
+    if (!window.maplibregl) {
+      console.warn('MapLibre unavailable; rendering catalogue without interactive map.');
+      S.mapFailed = true;
+      renderMapFallback();
+      renderStateSummary(list, counts);
+      return;
+    }
+    try {
+      S.map = new maplibregl.Map({
+        container,
+        style: {
+          version: 8,
+          sources: {
+            base: { type: 'raster', tiles: ['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', 'https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', 'https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'], tileSize: 256, attribution: '&copy; OpenStreetMap contributors &copy; CARTO' },
+            states: { type: 'geojson', data: geo },
+          },
+          layers: [
+            { id: 'base', type: 'raster', source: 'base' },
+            { id: 'states-fill', type: 'fill', source: 'states', paint: { 'fill-color': fillExpr(), 'fill-opacity': 0.82 } },
+            { id: 'states-line', type: 'line', source: 'states', paint: { 'line-color': '#ffffff', 'line-width': 0.7 } },
+            { id: 'states-sel', type: 'line', source: 'states', filter: ['==', ['get', 'name'], '__none__'], paint: { 'line-color': '#f59e0b', 'line-width': 2.6 } },
+          ],
         },
-        layers: [
-          { id: 'base', type: 'raster', source: 'base' },
-          { id: 'states-fill', type: 'fill', source: 'states', paint: { 'fill-color': fillExpr(), 'fill-opacity': 0.82 } },
-          { id: 'states-line', type: 'line', source: 'states', paint: { 'line-color': '#ffffff', 'line-width': 0.7 } },
-          { id: 'states-sel', type: 'line', source: 'states', filter: ['==', ['get', 'name'], '__none__'], paint: { 'line-color': '#f59e0b', 'line-width': 2.6 } },
-        ],
-      },
-      center: [79.6, 22.8],
-      zoom: 3.9,
-      minZoom: 3,
-      maxZoom: 9,
-      attributionControl: { compact: true },
-    });
-    S.map.on('load', updateMapPaint);
-    S.map.addControl(new maplibregl.NavigationControl({ showCompass: false }));
-    S.map.on('mousemove', 'states-fill', (e) => showTip(e));
-    S.map.on('mouseleave', 'states-fill', hideTip);
-    S.map.on('click', 'states-fill', (e) => {
-      const name = e.features[0].properties.name;
-      S.state = S.state === name ? null : name;
-      renderAll();
-    });
+        center: [79.6, 22.8],
+        zoom: 3.9,
+        minZoom: 3,
+        maxZoom: 9,
+        attributionControl: { compact: true },
+      });
+      S.map.on('load', () => { S.mapReady = true; updateMapPaint(); });
+      S.map.on('error', (err) => console.warn('MapLibre diagnostic:', err && err.error ? err.error.message : err));
+      S.map.addControl(new maplibregl.NavigationControl({ showCompass: false }));
+      S.map.on('mousemove', 'states-fill', (e) => showTip(e));
+      S.map.on('mouseleave', 'states-fill', hideTip);
+      S.map.on('click', 'states-fill', (e) => {
+        const name = e.features[0].properties.name;
+        S.state = S.state === name ? null : name;
+        syncStateSelect();
+        renderAll();
+      });
+    } catch (err) {
+      console.warn('Map initialization failed; catalogue remains available.', err);
+      S.mapFailed = true;
+      renderMapFallback();
+      renderStateSummary(list, counts);
+      return;
+    }
   } else {
-    S.map.getSource('states').setData(geo);
-    if (S.map.loaded()) updateMapPaint();
+    const source = S.mapReady && S.map.getSource('states');
+    if (source) source.setData(geo);
+    updateMapPaint();
   }
-  $('mapSub').textContent = S.state ? `Filtered to ${S.state} — click again to clear.` : 'Shaded by count in view — click a state to filter.';
+  $('mapSub').textContent = S.state
+    ? `Filtered to ${S.state}. Results include state-specific, national and applicable global sources. Click the state again or reset to clear.`
+    : 'Shaded by single-state records in view — click a state to filter. State filtering includes state-specific, national and applicable global sources.';
   renderStateSummary(list, counts);
+}
+
+function renderMapFallback() {
+  const el = $('map');
+  if (el) {
+    el.innerHTML = '<div class="map-fallback"><b>Interactive map temporarily unavailable.</b><span>Search, filters and catalogue intelligence remain available.</span></div>';
+  }
+}
+
+function syncStateSelect() {
+  const el = $('stateSelect');
+  if (el) el.value = S.state || '';
 }
 
 function renderStateSummary(list, counts) {
@@ -494,10 +568,11 @@ function openInMap(id) {
   if (!d) return;
   if (d.state) { S.state = d.state; renderAll(); }
   const feat = S.statesGeo.features.find((f) => f.properties.name === d.state);
-  if (feat && S.map) {
+  syncStateSelect();
+  if (feat && S.map && S.mapReady) {
     const bb = geojsonBBox(feat.geometry);
     S.map.fitBounds(bb, { padding: 40, duration: 600 });
-  } else if (S.map) {
+  } else if (S.map && S.mapReady) {
     S.map.flyTo({ center: [79.6, 22.8], zoom: 3.9, duration: 600 });
   }
   document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' });
@@ -535,7 +610,7 @@ function renderAssessment() {
     .filter((r) => r.s.score > 0)
     .sort((a, b) => b.s.score - a.s.score);
   el.innerHTML = rows.map(({ p, s }) => `
-    <button class="pbar" data-p="${p.id}" aria-pressed="${S.panel && S.panel.portal === p.id}">
+    <button class="pbar" type="button" data-p="${p.id}" aria-pressed="${S.panel && S.panel.type === 'portal' && S.panel.id === p.id ? 'true' : 'false'}">
       <span class="pl">${esc(p.name)}</span>
       <span class="track"><i style="width:${s.score}%"></i></span>
       <span class="pn">${s.score}</span>
@@ -548,6 +623,8 @@ function openPortal(id) {
   const o = orgOf(p.organisation);
   const s = portalScore(p);
   const ds = S.data.filter((d) => d.portal === id);
+  S.panel = { type: 'portal', id };
+  renderAssessment();
   $('panel').innerHTML = `
     <div class="panel-head">
       <span class="eyebrow">Portal</span>
@@ -589,22 +666,22 @@ function computeGap() {
   const state = $('gapState').value;
   const el = $('gapResult');
   const base = S.data.filter((d) => d.theme === theme);
-  const scoped = base.filter((d) => !d.state || d.state === state);
+  const scoped = base.filter((d) => isRelevantToState(d, state));
   const gov = scoped.filter((d) => d.source_class === 'authoritative');
   const open = scoped.filter((d) => d.access_tier === 'Open' || d.access_tier === 'Open (Registration)');
-  const dlVector = scoped.filter((d) => d.downloadable && d.formats.some((f) => /geojson|shapefile|geotiff|topojson|csv/i.test(f)));
+  const usableDownloads = scoped.filter((d) => d.downloadable && d.gis_ready);
   const apis = scoped.filter((d) => d.api || d.api_ready);
   const ogc = scoped.filter((d) => d.ogc);
   const eo = scoped.filter((d) => d.source_class === 'eo-derived');
   const glob = scoped.filter((d) => d.source_class === 'global-open');
   const stats = [
     ['Government sources', gov.length], ['Open datasets', open.length],
-    ['Downloadable (vector/raster)', dlVector.length], ['APIs', apis.length],
+    ['GIS-ready downloads', usableDownloads.length], ['APIs', apis.length],
     ['OGC services', ogc.length], ['Earth-observation alternatives', eo.length],
     ['Global open alternatives', glob.length],
   ];
-  const verdict = gapVerdict(dlVector.length, apis.length, ogc.length, open.length);
-  const cta = (dlVector.length === 0 && apis.length === 0)
+  const verdict = gapVerdict(usableDownloads.length, apis.length, ogc.length, open.length);
+  const cta = (usableDownloads.length === 0 && apis.length === 0 && ogc.length === 0 && (eo.length > 0 || glob.length > 0))
     ? `<div style="margin-top:16px"><a class="srcbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Explore Studio-assisted generation ↗</a></div>`
     : '';
   el.innerHTML = `<div class="gapcard">
@@ -661,7 +738,7 @@ function computeCompare() {
       <td><span class="tier"><span class="dot" style="background:#f59e0b"></span>Studio-assisted generation</span></td>
       <td>Where suitable public data is unavailable, Studio workflows can derive selected geospatial assets from imagery or other source data, subject to source availability, quality and project requirements.</td>
       <td>Project-specific AOI</td>
-      <td><a class="minbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Explore with Studio ↗</a></td>
+      <td><a class="minbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Explore with Studio ↗</a> <span class="status-badge status-nebula">Available via Nebula</span></td>
     </tr>
     </tbody></table>`;
   el.querySelectorAll('[data-tier]').forEach((b) => b.addEventListener('click', () => {
@@ -678,6 +755,12 @@ function computeCompare() {
 /* Ask GeoIndia (natural-language catalogue synthesis)                 */
 /* ------------------------------------------------------------------ */
 function askStudio(query) {
+  if (!S.data || !S.themes || !S.statesGeo) {
+    $('askResult').hidden = false;
+    $('askTitle').textContent = 'Ask GeoIndia is loading catalogue metadata';
+    $('askBody').innerHTML = '<p class="sub">Please try again once the catalogue has loaded.</p>';
+    return;
+  }
   const q = query.toLowerCase();
   const themes = S.themes.filter((t) => {
     const keys = [t.label.toLowerCase(), ...(THEME_SYNONYMS[t.id] || [])];
@@ -689,9 +772,19 @@ function askStudio(query) {
   if (/global|world/.test(q)) scope = 'Global';
   else if (/india|national/.test(q)) scope = null;
 
+  const detected = [];
+  if (themes.length) detected.push('theme: ' + themes.map((t) => t.label).join(', '));
+  if (state) detected.push('geography: ' + state);
+  if (scope) detected.push('scope: ' + scope);
+
+  if (!detected.length && !/(india|data|dataset|catalogue|catalog|gis|map|geo|geospatial)/.test(q)) {
+    renderAskInitial(query);
+    return;
+  }
+
   let ds = S.data.slice();
   if (themes.length) ds = ds.filter((d) => themes.some((t) => t.id === d.theme));
-  if (state) ds = ds.filter((d) => d.state === state || d.coverage === 'All India' || d.coverage === 'Global' || d.coverage === 'Regional');
+  if (state) ds = ds.filter((d) => isRelevantToState(d, state));
   if (scope) ds = ds.filter((d) => portalOf(d.portal).scope === scope);
   const n = ds.length;
 
@@ -701,12 +794,10 @@ function askStudio(query) {
   const fmts = [...new Set(ds.flatMap((d) => d.formats))];
   const open = ds.filter((d) => ['Open', 'Open (Registration)'].includes(d.access_tier)).length;
   const live = ds.filter((d) => d.link_health === 'live').length;
+  const broken = ds.filter((d) => d.link_health === 'dead' || d.link_health === 'down').length;
+  const unverified = ds.filter((d) => !['live', 'dead', 'down'].includes(d.link_health)).length;
   const yrs = ds.map((d) => d.updated_year || d.published_year || 0).filter((y) => y > 0);
 
-  const detected = [];
-  if (themes.length) detected.push('theme: ' + themes.map((t) => t.label).join(', '));
-  if (state) detected.push('geography: ' + state);
-  if (scope) detected.push('scope: ' + scope);
   const coverageLabel = state || (scope === 'Global' ? 'Global' : 'All India / national');
 
   $('askResult').hidden = false;
@@ -721,23 +812,38 @@ function askStudio(query) {
       <tr><th>Formats</th><td>${fmts.length ? fmts.map(esc).join(', ') : '—'}</td></tr>
       <tr><th>Coverage</th><td>${esc(coverageLabel)}</td></tr>
       <tr><th>Access</th><td>${open} openly accessible · ${n - open} restricted/other</td></tr>
-      <tr><th>Link health</th><td>${live} live · ${n - live} broken/down/unverified</td></tr>
+      <tr><th>Link health</th><td>${live} live · ${broken} broken/down · ${unverified} unverified</td></tr>
       <tr><th>Freshness</th><td>${yrs.length ? Math.max(...yrs) : 'not recorded'}</td></tr>
       <tr><th>Usability score</th><td>${ds.length ? Math.round(ds.reduce((a, d) => a + datasetScore(d), 0) / ds.length) : 0}/100 average</td></tr>
     </table>
     <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="ghostbtn" id="askBrowse">Browse these ${n} results</button>
-      <a class="ghostbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Analyse with Studio ↗</a>
+      <button class="ghostbtn" id="askBrowse">Browse matching catalogue</button>
+      <a class="ghostbtn" href="${STUDIO_URL}" target="_blank" rel="noopener noreferrer">Open NebulaCloud Studio ↗</a>
+      <span class="status-badge status-coming">Direct Studio handoff — Coming soon</span>
     </div>`;
   $('askBrowse').addEventListener('click', () => {
-    S.theme = themes.length === 1 ? themes[0].id : null;
+    S.theme = null;
     S.state = state || null;
-    if (themes.length) S.theme = themes[0].id;
+    S.matchIds = new Set(ds.map((d) => d.id));
+    S.askQuery = query;
     S.q = '';
     $('queryInput').value = '';
     renderAll();
     document.getElementById('datasets').scrollIntoView({ behavior: 'smooth' });
   });
+}
+
+function renderAskInitial(query) {
+  $('askResult').hidden = false;
+  $('askTitle').textContent = query ? 'Ask GeoIndia could not identify a catalogue intent' : 'Ask GeoIndia about the catalogue';
+  $('askBody').innerHTML = `<p class="sub">${query ? 'Try naming a theme, geography, source class or format.' : 'Ask for a theme, geography or source type and GeoIndia will synthesize indexed metadata.'}</p>
+    <div class="prompt-grid" aria-label="Example prompts">
+      ${['Building footprints for Telangana', 'DEM data for India', 'Global open building datasets', 'Flood datasets for Assam', 'Water and climate data for Karnataka'].map((p) => `<button class="prompt-chip" type="button">${esc(p)}</button>`).join('')}
+    </div>`;
+  $('askBody').querySelectorAll('.prompt-chip').forEach((b) => b.addEventListener('click', () => {
+    $('queryInput').value = b.textContent;
+    askStudio(b.textContent);
+  }));
 }
 
 /* ------------------------------------------------------------------ */
@@ -791,13 +897,16 @@ function downloadCSV() {
     }).join(',');
   });
   const csv = '\uFEFF' + [head, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.href = url;
   a.download = 'geoindia-current-view.csv';
   a.style.display = 'none';
   document.body.appendChild(a);
   a.click();
   setTimeout(() => {
+    URL.revokeObjectURL(url);
     a.remove();
   }, 0);
   const status = $('downloadStatus');
@@ -813,35 +922,39 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = $('searchForm');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    clearAskMatch();
     S.q = $('queryInput').value.trim();
-    if (S.mode === 'ask') { askStudio(S.q || 'India geospatial data'); S.q = ''; }
-    else { S.page = 1; renderList(); renderMap(); renderActiveBar(); }
+    S.page = 1; renderList(); renderMap(); renderActiveBar();
   });
 
   $('queryInput').addEventListener('input', () => {
-    if (S.mode === 'search') {
-      S.q = $('queryInput').value.trim();
-      S.page = 1; renderList(); renderMap(); renderActiveBar();
-    }
+    clearAskMatch();
+    S.q = $('queryInput').value.trim();
+    S.page = 1; renderList(); renderMap(); renderActiveBar();
   });
 
-  $('askBtn').addEventListener('click', () => setMode('ask'));
-  document.querySelectorAll('.mode').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
-  function setMode(m) {
-    S.mode = m;
-    document.querySelectorAll('.mode').forEach((x) => x.classList.toggle('active', x.dataset.mode === m));
-    document.querySelectorAll('.mode').forEach((x) => x.setAttribute('aria-pressed', x.dataset.mode === m));
-    $('askBtn').setAttribute('aria-pressed', m === 'ask');
-    if (m === 'ask') {
-      $('askResult').hidden = false;
-      if (S.q) askStudio(S.q);
-    } else {
-      $('askResult').hidden = true;
-    }
-  }
+  $('askBtn').addEventListener('click', () => {
+    const q = $('queryInput').value.trim();
+    $('askBtn').setAttribute('aria-pressed', 'true');
+    if (q) askStudio(q);
+    else renderAskInitial('');
+  });
 
   $('sortSelect').addEventListener('change', (e) => { S.sort = e.target.value; renderList(); });
   $('perSelect').addEventListener('change', (e) => { S.per = +e.target.value; S.page = 1; renderList(); });
   $('downloadBtn').addEventListener('click', downloadCSV);
-  $('mapReset').addEventListener('click', () => { S.state = null; renderAll(); });
+  $('mapReset').addEventListener('click', () => {
+    S.state = null;
+    syncStateSelect();
+    renderAll();
+    if (S.map && S.mapReady) {
+      S.map.flyTo({ center: [79.6, 22.8], zoom: 3.9, duration: 600 });
+      updateMapPaint();
+    }
+  });
+  $('drawerClose').addEventListener('click', closeDetail);
+  $('drawerBackdrop').addEventListener('click', closeDetail);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !$('datasetDrawer').hidden) closeDetail();
+  });
 });
