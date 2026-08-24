@@ -790,15 +790,13 @@ function downloadCSV() {
     }).join(',');
   });
   const csv = '\uFEFF' + [head, ...rows].join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
   a.download = 'geoindia-current-view.csv';
   a.style.display = 'none';
   document.body.appendChild(a);
   a.click();
   setTimeout(() => {
-    URL.revokeObjectURL(a.href);
     a.remove();
   }, 0);
   const status = $('downloadStatus');
