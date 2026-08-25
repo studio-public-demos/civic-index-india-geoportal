@@ -450,6 +450,36 @@ function geojsonBBox(geom) {
   return [[minX, minY], [maxX, maxY]];
 }
 
+function countryBoundaryFromStates(geo) {
+  const segments = new Map();
+  const keyOf = (a, b) => {
+    const ak = `${a[0]},${a[1]}`;
+    const bk = `${b[0]},${b[1]}`;
+    return ak < bk ? `${ak}|${bk}` : `${bk}|${ak}`;
+  };
+  const addRing = (ring) => {
+    for (let i = 0; i < ring.length - 1; i += 1) {
+      const a = ring[i];
+      const b = ring[i + 1];
+      const key = keyOf(a, b);
+      const item = segments.get(key) || { count: 0, coords: [a, b] };
+      item.count += 1;
+      segments.set(key, item);
+    }
+  };
+  geo.features.forEach((feature) => {
+    const geom = feature.geometry;
+    if (geom.type === 'Polygon') geom.coordinates.forEach(addRing);
+    else if (geom.type === 'MultiPolygon') geom.coordinates.forEach((poly) => poly.forEach(addRing));
+  });
+  return {
+    type: 'FeatureCollection',
+    features: [...segments.values()]
+      .filter((segment) => segment.count === 1)
+      .map((segment) => ({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: segment.coords } })),
+  };
+}
+
 function updateMapPaint() {
   if (!S.map || !S.mapReady || !S.map.getLayer('states-fill')) return;
   S.map.setPaintProperty('states-fill', 'fill-color', fillExpr());
@@ -488,10 +518,12 @@ function renderMap() {
           sources: {
             base: { type: 'raster', tiles: ['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', 'https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', 'https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'], tileSize: 256, attribution: '&copy; OpenStreetMap contributors &copy; CARTO' },
             states: { type: 'geojson', data: geo },
+            countryBoundary: { type: 'geojson', data: countryBoundaryFromStates(S.statesGeo) },
           },
           layers: [
             { id: 'base', type: 'raster', source: 'base' },
             { id: 'states-fill', type: 'fill', source: 'states', paint: { 'fill-color': fillExpr(), 'fill-opacity': 0.82 } },
+            { id: 'country-boundary', type: 'line', source: 'countryBoundary', paint: { 'line-color': '#18324a', 'line-width': 2.2, 'line-opacity': 0.9 } },
             { id: 'states-line', type: 'line', source: 'states', paint: { 'line-color': '#ffffff', 'line-width': 0.7 } },
             { id: 'states-sel', type: 'line', source: 'states', filter: ['==', ['get', 'name'], '__none__'], paint: { 'line-color': '#f59e0b', 'line-width': 2.6 } },
           ],
