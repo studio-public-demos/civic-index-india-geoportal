@@ -18,6 +18,8 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "assets" / "data"
+PUBLIC_URL = "https://geoindia.nebulacloud.in/"
+PUBLIC_HOST = "geoindia.nebulacloud.in"
 
 
 class SiteHTMLParser(HTMLParser):
@@ -46,8 +48,8 @@ class SiteHTMLParser(HTMLParser):
                 self.meta.append((key, content))
             if key in {"og:image", "twitter:image"} and content:
                 parsed = urlparse(content)
-                if parsed.scheme in {"http", "https"} and parsed.netloc == "studio-public-demos.github.io":
-                    self.local_assets.append(parsed.path.removeprefix("/civic-index-india-geoportal/"))
+                if parsed.scheme in {"http", "https"} and parsed.netloc == PUBLIC_HOST:
+                    self.local_assets.append(parsed.path.removeprefix("/"))
         if tag == "a" and a.get("target") == "_blank" and is_external(a.get("href", "")):
             self.external_blank_links.append((a.get("href", ""), a.get("rel", "")))
 
@@ -136,6 +138,24 @@ def validate_html(errors: list[str]) -> None:
             errors.append(f"External _blank link missing rel='noopener noreferrer': {href}")
 
     metas = dict(parser.meta)
+    if not (ROOT / "CNAME").exists():
+        errors.append("Missing GitHub Pages CNAME file")
+    elif (ROOT / "CNAME").read_text(encoding="utf-8").strip() != PUBLIC_HOST:
+        errors.append(f"CNAME must be {PUBLIC_HOST}")
+    if PUBLIC_URL not in html:
+        errors.append(f"Missing public canonical URL: {PUBLIC_URL}")
+    if "https://studio-public-demos.github.io/civic-index-india-geoportal/" in html:
+        errors.append("GitHub Pages URL must not remain in public HTML metadata")
+    required_public_metadata = (
+        f'<link rel="canonical" href="{PUBLIC_URL}">',
+        f'<meta property="og:url" content="{PUBLIC_URL}">',
+        f'<meta property="og:image" content="{PUBLIC_URL}assets/images/geoindia-social.png">',
+        f'<meta name="twitter:image" content="{PUBLIC_URL}assets/images/geoindia-social.png">',
+        f'"url": "{PUBLIC_URL}"',
+    )
+    for snippet in required_public_metadata:
+        if snippet not in html:
+            errors.append(f"Missing public metadata: {snippet}")
     for key in ("og:image", "twitter:image"):
         if key not in metas:
             errors.append(f"Missing social preview metadata: {key}")

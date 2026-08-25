@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://studio-public-demos.github.io/civic-index-india-geoportal/schemas/civic-index.schema.json",
+  "$id": "https://geoindia.nebulacloud.in/schemas/civic-index.schema.json",
   "title": "Nebula Civic Index — dataset record",
   "description": "Schema for a single geospatial dataset record in the Nebula Civic Index catalogue. Loosely aligned to DCAT / GeoDCAT concepts.",
   "type": "object",

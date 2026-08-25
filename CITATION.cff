@@ -9,7 +9,7 @@ type: software
 license: CC-BY-4.0
 date-released: 2026-08-20
 repository-code: "https://github.com/studio-public-demos/civic-index-india-geoportal"
-url: "https://studio-public-demos.github.io/civic-index-india-geoportal/"
+url: "https://geoindia.nebulacloud.in/"
 keywords:
   - geospatial
   - open-data
