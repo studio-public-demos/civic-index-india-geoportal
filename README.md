@@ -4,7 +4,9 @@
 
 GeoIndia is an open intelligence layer for India's fragmented public geospatial data. It helps users discover public datasets, services and portals; assess access, licence signals, provenance, freshness and usability; compare authoritative and alternative sources; identify evidence gaps; and move from discovery into analysis with NebulaCloud Studio.
 
-**Live site**: https://studio-public-demos.github.io/civic-index-india-geoportal/
+**Live site**: https://geoindia.nebulacloud.in/
+
+**Technical hosting origin**: https://studio-public-demos.github.io/civic-index-india-geoportal/
 
 > **Notice**
 > This repository is a public product showcase created with NebulaCloud Studio. The catalogue metadata, schema, methodology and static website are published openly. Proprietary prompts, private execution workflows and internal Studio infrastructure are not included.

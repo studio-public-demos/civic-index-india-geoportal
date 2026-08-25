@@ -3,6 +3,7 @@ const path = require('path');
 const { test, expect } = require('@playwright/test');
 
 const ROOT = path.resolve(__dirname, '../..');
+const PUBLIC_URL = 'https://geoindia.nebulacloud.in/';
 const datasets = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/data/datasets.json'), 'utf8'));
 const themes = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/data/themes.json'), 'utf8'));
 const statesGeo = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/data/india-states.geojson'), 'utf8'));
@@ -68,7 +69,10 @@ test('hero, SEO, status vocabulary and global architecture stay launch-truthful'
   await page.goto('/');
   await waitForCatalogue(page);
   await expect(page).toHaveTitle(/GeoIndia/);
-  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /geoindia-social\.png/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', PUBLIC_URL);
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', PUBLIC_URL);
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', `${PUBLIC_URL}assets/images/geoindia-social.png`);
+  await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute('content', `${PUBLIC_URL}assets/images/geoindia-social.png`);
   await expect(page.locator('.trustline')).toContainText('Underlying datasets are not re-hosted');
   await expect(page.getByText('latest link check')).toBeVisible();
   await expect(page.getByText('Live catalogue')).toBeVisible();
