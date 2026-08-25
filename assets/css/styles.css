@@ -48,6 +48,7 @@ a{color:var(--primary)}
 .masthead{background:linear-gradient(180deg,var(--primary-2),var(--primary));color:#fff;padding:44px 0 40px}
 .brandrow{display:flex;align-items:center;gap:14px;margin-bottom:22px}
 .brandmark{width:42px;height:42px;border-radius:10px;background:var(--accent);color:#241b06;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;flex:none}
+.brandlogo{width:174px;height:auto;max-height:46px;object-fit:contain;border-radius:0;background:#fff;padding:5px 7px}
 .brandtxt{display:flex;flex-direction:column;line-height:1.2}
 .brand-name{font-weight:700;font-size:18px}
 .brand-sub{font-size:13px;color:rgba(255,255,255,.72)}
